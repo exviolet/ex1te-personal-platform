@@ -1,0 +1,288 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Bakytzhan Izbassarov — Notes, lab, projects</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --paper: #f6f1e7;
+      --paper-2: #ebe2d0;
+      --ink: #20201c;
+      --muted: #69645a;
+      --line: #d8ccb8;
+      --red: #b84b32;
+      --blue: #305d7b;
+      --green: #507257;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      --serif: Georgia, "Times New Roman", serif;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at 18% 8%, rgba(184,75,50,.13), transparent 24rem),
+        radial-gradient(circle at 82% 16%, rgba(48,93,123,.12), transparent 30rem),
+        linear-gradient(180deg, var(--paper), #fbf8ef 52%, var(--paper));
+      font-family: var(--serif);
+      line-height: 1.5;
+    }
+    a { color: inherit; text-decoration-thickness: 1px; text-underline-offset: 4px; }
+    .wrap { width: min(1120px, calc(100% - 42px)); margin: 0 auto; }
+    header {
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+      background: rgba(246,241,231,.84);
+      backdrop-filter: blur(14px);
+    }
+    .topbar { height: 76px; display: flex; justify-content: space-between; align-items: center; }
+    .wordmark { text-decoration: none; display: flex; flex-direction: column; gap: 2px; }
+    .wordmark strong { font-size: 21px; letter-spacing: -.02em; }
+    .wordmark span { font-family: var(--mono); color: var(--muted); font-size: 11px; letter-spacing: .08em; text-transform: uppercase; }
+    nav { display: flex; gap: 18px; font-family: var(--sans); font-size: 14px; color: var(--muted); }
+    nav a { text-decoration: none; }
+    nav a:hover { color: var(--red); }
+    .hero {
+      display: grid;
+      grid-template-columns: 1.05fr .95fr;
+      gap: 54px;
+      min-height: calc(100vh - 76px);
+      align-items: center;
+      padding: 58px 0 70px;
+    }
+    .pretitle {
+      font-family: var(--mono);
+      color: var(--red);
+      font-size: 12px;
+      letter-spacing: .16em;
+      text-transform: uppercase;
+      margin-bottom: 18px;
+    }
+    h1 {
+      font-size: clamp(48px, 7vw, 94px);
+      line-height: .92;
+      letter-spacing: -.055em;
+      margin: 0;
+      max-width: 800px;
+    }
+    .hero-text {
+      margin-top: 28px;
+      font-size: clamp(19px, 2vw, 25px);
+      line-height: 1.52;
+      color: #3f3c35;
+      max-width: 720px;
+    }
+    .hero-text a { color: var(--red); }
+    .first-links {
+      margin-top: 34px;
+      display: grid;
+      gap: 12px;
+      max-width: 680px;
+      font-family: var(--sans);
+    }
+    .first-link {
+      border-top: 1px solid var(--line);
+      padding: 14px 0 13px;
+      display: grid;
+      grid-template-columns: 92px 1fr auto;
+      gap: 18px;
+      align-items: baseline;
+      text-decoration: none;
+      transition: color .18s ease, padding-left .18s ease;
+    }
+    .first-link:hover { color: var(--red); padding-left: 8px; }
+    .first-link small { font-family: var(--mono); font-size: 11px; color: var(--muted); }
+    .first-link span { font-weight: 700; }
+    .first-link em { color: var(--muted); font-style: normal; font-size: 13px; }
+    .object {
+      border: 1px solid var(--ink);
+      background: rgba(255,255,255,.2);
+      padding: 14px;
+      position: relative;
+      box-shadow: 14px 14px 0 rgba(32,32,28,.1);
+    }
+    .object-inner {
+      min-height: 520px;
+      border: 1px solid var(--line);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,.38), rgba(255,255,255,.1)),
+        repeating-linear-gradient(0deg, transparent 0 31px, rgba(32,32,28,.045) 32px),
+        repeating-linear-gradient(90deg, transparent 0 31px, rgba(32,32,28,.035) 32px);
+      position: relative;
+      overflow: hidden;
+    }
+    .sun {
+      position: absolute;
+      width: 104px;
+      height: 104px;
+      border-radius: 50%;
+      background: var(--red);
+      top: 58px;
+      left: 50%;
+      transform: translateX(-50%);
+      box-shadow: 0 0 0 18px rgba(184,75,50,.1), 0 0 0 38px rgba(184,75,50,.055);
+      transition: transform .5s ease, background .5s ease;
+    }
+    .steppe {
+      position: absolute;
+      inset: 0;
+    }
+    .hill {
+      position: absolute;
+      left: -12%; right: -12%;
+      height: 190px;
+      bottom: var(--b);
+      background: var(--c);
+      border-radius: 52% 48% 0 0 / 100% 100% 0 0;
+      transform: rotate(var(--r));
+      opacity: var(--o);
+    }
+    .train {
+      position: absolute;
+      bottom: 108px;
+      left: 12%;
+      right: 12%;
+      height: 1px;
+      background: var(--ink);
+    }
+    .train::before, .train::after {
+      content: "";
+      position: absolute;
+      top: -8px;
+      width: 16px; height: 16px;
+      border: 1px solid var(--ink);
+      background: var(--paper);
+      transform: rotate(45deg);
+      transition: left .5s ease;
+    }
+    .train::before { left: var(--a, 18%); }
+    .train::after { left: var(--b2, 65%); }
+    .object-label {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      border: 1px solid var(--ink);
+      background: rgba(246,241,231,.86);
+      padding: 16px;
+      font-family: var(--sans);
+      display: flex;
+      justify-content: space-between;
+      gap: 18px;
+      align-items: center;
+    }
+    .object-label strong { display: block; margin-bottom: 4px; }
+    .object-label span { color: var(--muted); font-size: 13px; }
+    .object-label button {
+      appearance: none;
+      border: 1px solid var(--ink);
+      background: var(--ink);
+      color: var(--paper);
+      padding: 10px 12px;
+      font-family: var(--mono);
+      cursor: pointer;
+      transition: transform .18s ease, background .18s ease;
+    }
+    .object-label button:hover { transform: translateY(-2px); background: var(--red); }
+    .object.night .sun { transform: translateX(-50%) translateY(260px); background: var(--blue); }
+    .object.night .object-inner { background: linear-gradient(180deg, #20283a, #5f604f 70%, #343227); color: var(--paper); }
+    .object.night .hill { filter: brightness(.65); }
+    .object.night .train::before { left: 38%; }
+    .object.night .train::after { left: 78%; }
+    .sections { display: grid; grid-template-columns: 240px 1fr; gap: 44px; border-top: 1px solid var(--line); padding: 54px 0; }
+    .side-title { font-family: var(--mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); position: sticky; top: 104px; height: fit-content; }
+    .posts { display: grid; gap: 0; }
+    .post { display: grid; grid-template-columns: 142px 1fr; gap: 28px; padding: 24px 0; border-bottom: 1px solid var(--line); }
+    .post time { font-family: var(--mono); color: var(--muted); font-size: 12px; padding-top: 7px; }
+    .post h2 { font-size: clamp(27px, 3.2vw, 42px); line-height: 1.04; letter-spacing: -.04em; margin: 0 0 9px; }
+    .post p { margin: 0; color: var(--muted); font-family: var(--sans); max-width: 650px; }
+    .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-top: 30px; }
+    .card { border: 1px solid var(--line); padding: 18px; min-height: 142px; background: rgba(255,255,255,.2); }
+    .card small { font-family: var(--mono); color: var(--red); }
+    .card h3 { margin: 18px 0 8px; font-size: 22px; }
+    .card p { margin: 0; color: var(--muted); font-family: var(--sans); font-size: 14px; }
+    footer { border-top: 1px solid var(--line); padding: 42px 0 66px; color: var(--muted); font-family: var(--sans); }
+    @media (max-width: 900px) {
+      .topbar { height: auto; padding: 16px 0; align-items: flex-start; flex-direction: column; gap: 14px; }
+      nav { flex-wrap: wrap; gap: 12px; }
+      .hero, .sections { grid-template-columns: 1fr; min-height: unset; }
+      .object { order: -1; }
+      .first-link { grid-template-columns: 70px 1fr; }
+      .first-link em { display: none; }
+      .post, .cards { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap topbar">
+      <a class="wordmark" href="#"><strong>Bakytzhan Izbassarov</strong><span>also writing as ex1te</span></a>
+      <nav><a href="#start">Start here</a><a href="#writing">Writing</a><a href="#lab">Lab</a><a href="#bookcase">Bookcase</a><a href="#about">About</a></nav>
+    </div>
+  </header>
+
+  <main class="wrap">
+    <section class="hero">
+      <div>
+        <div class="pretitle">personal website · notes from Kazakhstan</div>
+        <h1>Software, agents and quiet systems for doing real work.</h1>
+        <p class="hero-text">Привет, я Бакытжан. Здесь я собираю тексты, проекты и наблюдения про AI workflow, Hermes, локальные инструменты, заметки и то, как из хаоса сделать личную рабочую систему.</p>
+        <div class="first-links" id="start">
+          <a class="first-link" href="#"><small>START</small><span>Как я думаю об агентных workflow</span><em>эссе</em></a>
+          <a class="first-link" href="#"><small>USES</small><span>Мой сетап: Arch, Niri, tmux, Neovim, Hermes</span><em>страница</em></a>
+          <a class="first-link" href="#"><small>LAB</small><span>Memory Wiki и другие маленькие эксперименты</span><em>проект</em></a>
+        </div>
+      </div>
+
+      <aside class="object" id="object">
+        <div class="object-inner">
+          <div class="steppe">
+            <div class="sun"></div>
+            <div class="hill" style="--b:0px;--c:#cbbd97;--r:-1deg;--o:1"></div>
+            <div class="hill" style="--b:42px;--c:#d7c9a5;--r:2deg;--o:.86"></div>
+            <div class="hill" style="--b:96px;--c:#e4d8bd;--r:-3deg;--o:.9"></div>
+            <div class="train"></div>
+          </div>
+          <div class="object-label">
+            <div><strong>Steppe clock</strong><span>Не “нейронная сетка”, а спокойный локальный символ: день/ночь, дорога, движение.</span></div>
+            <button id="toggle">toggle</button>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="sections" id="writing">
+      <div class="side-title">recent writing</div>
+      <div class="posts">
+        <article class="post"><time>12 Jul 2026</time><div><h2>Заметки должны становиться действиями</h2><p>Почему второй мозг бесполезен, если он не помогает принимать решения и запускать процессы.</p></div></article>
+        <article class="post"><time>08 Jul 2026</time><div><h2>Hermes как среда выполнения, а не просто чат</h2><p>Модели меняются. Настоящая ценность — в памяти, инструментах, терминале и проверке результата.</p></div></article>
+        <article class="post"><time>30 Jun 2026</time><div><h2>Как не утонуть в агентах</h2><p>Личный рецепт: меньше магии, больше явных ролей, логов и маленьких проверяемых артефактов.</p></div></article>
+      </div>
+    </section>
+
+    <section class="sections" id="lab">
+      <div class="side-title">lab shelves</div>
+      <div>
+        <h1 style="font-size:clamp(38px,5vw,72px);margin:0;letter-spacing:-.055em;line-height:.95">A public archive of private experiments.</h1>
+        <div class="cards">
+          <div class="card"><small>PROJECT</small><h3>Memory Wiki</h3><p>Локальная карта прошлых разговоров и решений.</p></div>
+          <div class="card"><small>WORKFLOW</small><h3>Agent routing</h3><p>Когда Claude, Codex и Hermes должны делать разные вещи.</p></div>
+          <div class="card"><small>NOTEBOOK</small><h3>Uses</h3><p>Живой список инструментов, которые реально остались.</p></div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="wrap">© Bakytzhan Izbassarov / ex1te · RSS · GitHub · Telegram</footer>
+
+  <script>
+    const object = document.getElementById('object');
+    document.getElementById('toggle').addEventListener('click', () => object.classList.toggle('night'));
+  </script>
+</body>
+</html>

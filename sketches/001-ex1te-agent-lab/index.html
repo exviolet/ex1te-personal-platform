@@ -1,0 +1,382 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ex1te — Agent Workflow Lab</title>
+  <style>
+    * { box-sizing: border-box; }
+    :root {
+      --bg: #090a0f;
+      --panel: rgba(255,255,255,.055);
+      --panel-strong: rgba(255,255,255,.09);
+      --text: #eef2ff;
+      --muted: #9aa4b7;
+      --line: rgba(255,255,255,.12);
+      --violet: #8b6dff;
+      --cyan: #70e1ff;
+      --green: #9df0b2;
+      --amber: #ffd27c;
+      --danger: #ff7d9b;
+      --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
+      --sans: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --serif: Georgia, "Times New Roman", serif;
+    }
+    html { scroll-behavior: smooth; }
+    body {
+      margin: 0;
+      font-family: var(--sans);
+      background:
+        radial-gradient(circle at 72% 6%, rgba(139,109,255,.28), transparent 32rem),
+        radial-gradient(circle at 9% 18%, rgba(112,225,255,.16), transparent 28rem),
+        linear-gradient(180deg, #090a0f 0%, #10121b 48%, #090a0f 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+    body::before {
+      content: "";
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      opacity: .28;
+      background-image:
+        linear-gradient(rgba(255,255,255,.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px);
+      background-size: 48px 48px;
+      mask-image: linear-gradient(to bottom, #000 0%, transparent 70%);
+    }
+    a { color: inherit; text-decoration: none; }
+    .shell { width: min(1180px, calc(100% - 40px)); margin: 0 auto; }
+    header {
+      height: 74px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      backdrop-filter: blur(18px);
+      border-bottom: 1px solid rgba(255,255,255,.06);
+    }
+    .brand { display: flex; align-items: baseline; gap: 12px; }
+    .brand strong { font-family: var(--mono); font-size: 15px; letter-spacing: .08em; color: white; }
+    .brand span { color: var(--muted); font-size: 13px; }
+    nav { display: flex; gap: 8px; align-items: center; }
+    nav a {
+      font-size: 13px;
+      color: var(--muted);
+      padding: 8px 10px;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      transition: .2s ease;
+    }
+    nav a:hover { color: var(--text); border-color: var(--line); background: rgba(255,255,255,.04); }
+    .hero {
+      min-height: calc(100vh - 74px);
+      display: grid;
+      grid-template-columns: 1.02fr .98fr;
+      align-items: center;
+      gap: 58px;
+      padding: 56px 0 74px;
+    }
+    .eyebrow { font-family: var(--mono); color: var(--green); font-size: 12px; letter-spacing: .18em; text-transform: uppercase; margin-bottom: 18px; }
+    h1 {
+      font-size: clamp(54px, 9vw, 122px);
+      line-height: .86;
+      letter-spacing: -.08em;
+      margin: 0;
+      max-width: 760px;
+    }
+    h1 .soft { color: transparent; -webkit-text-stroke: 1px rgba(238,242,255,.55); text-stroke: 1px rgba(238,242,255,.55); }
+    .lead {
+      margin: 28px 0 0;
+      color: #cbd3e4;
+      font-size: clamp(18px, 2vw, 23px);
+      line-height: 1.55;
+      max-width: 680px;
+    }
+    .lead b { color: white; font-weight: 650; }
+    .hero-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+    .btn {
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.06);
+      color: white;
+      padding: 13px 16px;
+      border-radius: 14px;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      transition: transform .2s ease, background .2s ease, border .2s ease;
+      cursor: pointer;
+    }
+    .btn:hover { transform: translateY(-2px); background: rgba(255,255,255,.1); border-color: rgba(255,255,255,.24); }
+    .btn.primary { background: linear-gradient(135deg, rgba(139,109,255,.95), rgba(112,225,255,.72)); border-color: transparent; color: #060710; font-weight: 750; }
+    .identity-strip {
+      margin-top: 38px;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      max-width: 690px;
+    }
+    .id-card {
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 14px 14px 13px;
+      background: rgba(255,255,255,.045);
+    }
+    .id-card small { font-family: var(--mono); color: var(--muted); display: block; margin-bottom: 8px; font-size: 11px; }
+    .id-card strong { font-size: 15px; }
+    .lab-card {
+      border: 1px solid rgba(255,255,255,.12);
+      background: linear-gradient(180deg, rgba(255,255,255,.1), rgba(255,255,255,.035));
+      border-radius: 34px;
+      padding: 18px;
+      box-shadow: 0 30px 90px rgba(0,0,0,.34), inset 0 1px 0 rgba(255,255,255,.12);
+      position: relative;
+      overflow: hidden;
+    }
+    .lab-card::after {
+      content: "";
+      position: absolute;
+      inset: -2px;
+      pointer-events: none;
+      border-radius: inherit;
+      background: radial-gradient(circle at var(--mx, 50%) var(--my, 50%), rgba(112,225,255,.22), transparent 18rem);
+      opacity: .8;
+      transition: opacity .2s ease;
+    }
+    .viz {
+      position: relative;
+      z-index: 1;
+      height: min(560px, 70vh);
+      min-height: 440px;
+      border-radius: 24px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at center, rgba(139,109,255,.14), transparent 45%),
+        linear-gradient(180deg, rgba(8,10,16,.72), rgba(8,10,16,.92));
+      border: 1px solid rgba(255,255,255,.09);
+    }
+    canvas { position: absolute; inset: 0; width: 100%; height: 100%; }
+    .node {
+      position: absolute;
+      border: 1px solid rgba(255,255,255,.18);
+      background: rgba(10,12,20,.72);
+      backdrop-filter: blur(14px);
+      padding: 9px 11px;
+      border-radius: 999px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: #dfe7ff;
+      box-shadow: 0 0 28px rgba(139,109,255,.16);
+      cursor: pointer;
+      transition: transform .2s ease, background .2s ease, border .2s ease;
+      user-select: none;
+    }
+    .node:hover, .node.active { transform: scale(1.08); background: rgba(139,109,255,.22); border-color: rgba(112,225,255,.55); }
+    .n1 { left: 12%; top: 16%; }
+    .n2 { left: 62%; top: 12%; }
+    .n3 { left: 23%; top: 47%; }
+    .n4 { left: 59%; top: 46%; }
+    .n5 { left: 38%; top: 73%; }
+    .center-node {
+      left: 50%; top: 50%; transform: translate(-50%, -50%);
+      background: linear-gradient(135deg, rgba(139,109,255,.32), rgba(112,225,255,.15));
+      padding: 16px 18px;
+      color: white;
+      font-weight: 800;
+    }
+    .center-node:hover, .center-node.active { transform: translate(-50%, -50%) scale(1.07); }
+    .panel-caption {
+      position: absolute;
+      left: 18px;
+      right: 18px;
+      bottom: 18px;
+      z-index: 2;
+      display: flex;
+      justify-content: space-between;
+      align-items: end;
+      gap: 18px;
+      border-top: 1px solid rgba(255,255,255,.1);
+      padding-top: 16px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .panel-caption strong { color: white; display: block; margin-bottom: 4px; }
+    .pulse { font-family: var(--mono); color: var(--green); }
+    .section { padding: 66px 0; border-top: 1px solid rgba(255,255,255,.08); }
+    .section-head { display: flex; justify-content: space-between; gap: 24px; align-items: end; margin-bottom: 26px; }
+    .section h2 { font-size: clamp(28px, 4vw, 46px); letter-spacing: -.05em; margin: 0; }
+    .section-head p { max-width: 460px; color: var(--muted); line-height: 1.55; margin: 0; }
+    .grid { display: grid; grid-template-columns: 1.3fr .9fr .9fr; gap: 14px; }
+    .post {
+      min-height: 190px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,.045);
+      border-radius: 24px;
+      padding: 22px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform .18s ease, background .18s ease, border .18s ease;
+    }
+    .post:hover { transform: translateY(-4px); background: rgba(255,255,255,.075); border-color: rgba(255,255,255,.22); }
+    .post:first-child { grid-row: span 2; min-height: 394px; background: linear-gradient(160deg, rgba(139,109,255,.18), rgba(255,255,255,.04)); }
+    .post .tag { font-family: var(--mono); color: var(--cyan); font-size: 12px; }
+    .post h3 { margin: 20px 0 12px; font-size: 25px; letter-spacing: -.04em; line-height: 1.05; }
+    .post:first-child h3 { font-size: clamp(34px, 5vw, 58px); }
+    .post p { color: var(--muted); margin: 0; line-height: 1.5; }
+    .date { font-family: var(--mono); color: #748096; font-size: 12px; margin-top: 22px; }
+    footer { color: var(--muted); padding: 48px 0 70px; display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid rgba(255,255,255,.08); }
+    footer strong { color: white; }
+    @media (max-width: 900px) {
+      header { height: auto; padding: 16px 0; }
+      header .shell { flex-direction: column; align-items: flex-start; gap: 12px; }
+      nav { flex-wrap: wrap; }
+      .hero { grid-template-columns: 1fr; min-height: unset; padding-top: 42px; }
+      .lab-card { order: -1; }
+      .identity-strip, .grid { grid-template-columns: 1fr; }
+      .post:first-child { min-height: 260px; }
+      .section-head, footer { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="shell" style="display:flex;align-items:center;justify-content:space-between;width:min(1180px,calc(100% - 40px));">
+      <a class="brand" href="#top"><strong>ex1te</strong><span>personal operating system</span></a>
+      <nav aria-label="Sections">
+        <a href="#writing">Writing</a>
+        <a href="#lab">Lab</a>
+        <a href="#projects">Projects</a>
+        <a href="#uses">Uses</a>
+        <a href="#now">Now</a>
+      </nav>
+    </div>
+  </header>
+
+  <main id="top" class="shell">
+    <section class="hero">
+      <div>
+        <div class="eyebrow">AI workflow · tools · notes · experiments</div>
+        <h1><span class="soft">ex</span>1te<br/>lab</h1>
+        <p class="lead">
+          Я Бакытжан Избасаров. Собираю свою рабочую среду вокруг <b>агентов, терминала, заметок и автоматизации</b> — и веду публичный журнал того, что реально работает.
+        </p>
+        <div class="hero-actions">
+          <a class="btn primary" href="#lab">Запустить карту агентов →</a>
+          <a class="btn" href="#writing">Читать последние заметки</a>
+        </div>
+        <div class="identity-strip" aria-label="Identity options">
+          <div class="id-card"><small>HANDLE</small><strong>ex1te</strong></div>
+          <div class="id-card"><small>RU</small><strong>Бакытжан Избасаров</strong></div>
+          <div class="id-card"><small>KZ</small><strong>Бақытжан Избасаров</strong></div>
+        </div>
+      </div>
+
+      <aside class="lab-card" id="lab">
+        <div class="viz" aria-label="Interactive agent constellation">
+          <canvas id="network"></canvas>
+          <div class="node n1" data-note="Hermes keeps the conversation, tools and memory in one runtime.">Hermes</div>
+          <div class="node n2" data-note="Claude Code and Codex become hands for separate implementation passes.">Claude / Codex</div>
+          <div class="node n3" data-note="Obsidian remains a vault, not the whole brain.">Obsidian</div>
+          <div class="node center-node" data-note="This site is the public surface of the private workflow.">ex1te OS</div>
+          <div class="node n4" data-note="tmux, nvim and Niri keep the environment sharp and local-first.">terminal</div>
+          <div class="node n5" data-note="Small scripts turn repeated friction into durable tools.">automation</div>
+          <div class="panel-caption">
+            <div><strong id="node-title">Interactive hero idea</strong><span id="node-copy">Hover/click nodes: the homepage becomes a small map of your agent workflow.</span></div>
+            <div class="pulse">● live sketch</div>
+          </div>
+        </div>
+      </aside>
+    </section>
+
+    <section class="section" id="writing">
+      <div class="section-head">
+        <h2>Latest notes</h2>
+        <p>Не академический блог и не Twitter-лента. Короткие практические записи, длинные эссе и отчёты из лаборатории.</p>
+      </div>
+      <div class="grid">
+        <article class="post">
+          <div><span class="tag">LAB REPORT</span><h3>Что я понял, когда агентам стало можно доверять руки</h3><p>Заметка о том, где агентные пайплайны реально экономят внимание, а где просто создают шум.</p></div><div class="date">12 Jul 2026 · 9 min</div>
+        </article>
+        <article class="post"><div><span class="tag">WORKFLOW</span><h3>Hermes как рабочая среда, а не чат</h3><p>Почему tool runtime важнее очередной модели.</p></div><div class="date">08 Jul 2026 · 6 min</div></article>
+        <article class="post"><div><span class="tag">USES</span><h3>Arch, Niri, tmux, Neovim</h3><p>Мой локальный стек и что в нём до сих пор раздражает.</p></div><div class="date">04 Jul 2026 · 5 min</div></article>
+        <article class="post"><div><span class="tag">NOTE</span><h3>Заметки должны становиться действиями</h3><p>Про разницу между вторым мозгом и системой выполнения.</p></div><div class="date">29 Jun 2026 · 4 min</div></article>
+        <article class="post"><div><span class="tag">PROJECT</span><h3>Memory Wiki</h3><p>Локальная карта прошлых разговоров, чтобы агент помнил без мистики.</p></div><div class="date">21 Jun 2026 · 7 min</div></article>
+      </div>
+    </section>
+  </main>
+
+  <footer class="shell">
+    <div><strong>ex1te</strong><br/>Agent workflow lab by Bakytzhan Izbassarov.</div>
+    <div>RSS · GitHub · Telegram · Email</div>
+  </footer>
+
+  <script>
+    const card = document.querySelector('.lab-card');
+    card.addEventListener('pointermove', (e) => {
+      const r = card.getBoundingClientRect();
+      card.style.setProperty('--mx', ((e.clientX - r.left) / r.width) * 100 + '%');
+      card.style.setProperty('--my', ((e.clientY - r.top) / r.height) * 100 + '%');
+    });
+
+    const title = document.getElementById('node-title');
+    const copy = document.getElementById('node-copy');
+    const nodes = [...document.querySelectorAll('.node')];
+    nodes.forEach(node => {
+      node.addEventListener('click', () => {
+        nodes.forEach(n => n.classList.remove('active'));
+        node.classList.add('active');
+        title.textContent = node.textContent.trim();
+        copy.textContent = node.dataset.note;
+      });
+    });
+
+    const canvas = document.getElementById('network');
+    const ctx = canvas.getContext('2d');
+    let dpr = 1;
+    function resize() {
+      dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    const points = [
+      [0.19,0.22],[0.71,0.18],[0.34,0.55],[0.50,0.50],[0.69,0.54],[0.47,0.80]
+    ];
+    function draw(t=0) {
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      ctx.clearRect(0,0,w,h);
+      ctx.lineWidth = 1;
+      for (let i=0; i<points.length; i++) {
+        for (let j=i+1; j<points.length; j++) {
+          if (Math.abs(i-j) > 3) continue;
+          const [ax,ay] = points[i], [bx,by] = points[j];
+          const pulse = .25 + .25*Math.sin(t/700 + i + j);
+          ctx.strokeStyle = `rgba(112,225,255,${.12 + pulse})`;
+          ctx.beginPath();
+          ctx.moveTo(ax*w, ay*h);
+          ctx.lineTo(bx*w, by*h);
+          ctx.stroke();
+        }
+      }
+      points.forEach(([x,y], i) => {
+        const r = 5 + 2*Math.sin(t/520 + i);
+        const g = ctx.createRadialGradient(x*w,y*h,0,x*w,y*h,32);
+        g.addColorStop(0, 'rgba(157,240,178,.9)');
+        g.addColorStop(1, 'rgba(157,240,178,0)');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(x*w,y*h,r*4,0,Math.PI*2); ctx.fill();
+        ctx.fillStyle = 'rgba(238,242,255,.9)';
+        ctx.beginPath(); ctx.arc(x*w,y*h,r/2,0,Math.PI*2); ctx.fill();
+      });
+      requestAnimationFrame(draw);
+    }
+    resize(); draw(); window.addEventListener('resize', resize);
+  </script>
+</body>
+</html>

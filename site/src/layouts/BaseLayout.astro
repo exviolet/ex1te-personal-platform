@@ -37,7 +37,31 @@ const personSchema = {
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content={description} />
-    <meta name="color-scheme" content="light" />
+    <meta name="color-scheme" content="light dark" />
+    <meta name="theme-color" content="#f3f0e7" data-theme-color data-light-color="#f3f0e7" data-dark-color="#171916" />
+    <script is:inline>
+      (() => {
+        const root = document.documentElement;
+        let savedTheme = null;
+
+        try {
+          savedTheme = localStorage.getItem('ex1te-theme');
+        } catch {
+          // System preference remains the fallback when storage is unavailable.
+        }
+
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const validSavedTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : null;
+        const theme = validSavedTheme ?? (systemDark ? 'dark' : 'light');
+        const themeColor = document.querySelector('[data-theme-color]');
+        const color = themeColor?.getAttribute(`data-${theme}-color`);
+
+        root.dataset.theme = theme;
+        root.dataset.themeSource = validSavedTheme ? 'saved' : 'system';
+        root.style.colorScheme = theme;
+        if (themeColor && color) themeColor.setAttribute('content', color);
+      })();
+    </script>
     <meta name="generator" content={Astro.generator} />
 
     <link rel="canonical" href={canonicalURL} />

@@ -176,3 +176,89 @@ test('repository uses local no-ff branch merges without a pull request gate', as
   assert.match(contributing, /git merge --no-ff/);
   assert.doesNotMatch(contributing, /open a pull request/i);
 });
+
+test('theme system initializes before paint and exposes an accessible persistent switcher', async () => {
+  const home = await readBuilt('index.html');
+  const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
+
+  assert.match(home, /name="color-scheme" content="light dark"/);
+  assert.match(home, /data-theme-color/);
+  assert.match(home, /data-theme-toggle/);
+  assert.match(home, /aria-label="Dark theme"/);
+  assert.match(home, /aria-pressed="false"/);
+  assert.match(home, /localStorage\.getItem\(['"]ex1te-theme['"]\)/);
+  assert.match(home, /localStorage\.setItem\(['"]ex1te-theme['"]/);
+  assert.match(home, /matchMedia\(['"]\(prefers-color-scheme: dark\)['"]\)/);
+
+  const initializer = home.indexOf("localStorage.getItem('ex1te-theme')");
+  const stylesheet = home.indexOf('rel="stylesheet"');
+  const body = home.indexOf('<body>');
+  assert.ok(initializer >= 0 && initializer < stylesheet, 'theme initializer must precede the stylesheet');
+  assert.ok(stylesheet < body, 'stylesheet must load before body content');
+
+  assert.match(styles, /html\[data-theme=['"]dark['"]\]/);
+  assert.match(styles, /@media\s*\(prefers-color-scheme:\s*dark\)/);
+  assert.match(styles, /--theme-control-track:/);
+});
+
+test('theme state semantics survive invalid or unavailable storage', async () => {
+  const layout = await readFile(path.join(siteRoot, 'src/layouts/BaseLayout.astro'), 'utf8');
+  const switcher = await readFile(path.join(siteRoot, 'src/components/ThemeSwitcher.astro'), 'utf8');
+  const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
+
+  assert.match(layout, /const validSavedTheme = savedTheme === 'light' \|\| savedTheme === 'dark'/);
+  assert.match(layout, /themeSource = validSavedTheme \? 'saved' : 'system'/);
+  assert.match(switcher, /aria-label="Dark theme"/);
+  assert.doesNotMatch(switcher, /setAttribute\(['"]aria-label['"]/);
+  assert.match(switcher, /let hasManualOverride = false/);
+  assert.match(switcher, /hasManualOverride = true/);
+  assert.match(switcher, /!readStoredTheme\(\) && !hasManualOverride/);
+  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.theme-switcher \{[^}]*min-width:44px;[^}]*min-height:44px;/);
+});
+
+test('theme bearing keeps day and night labels anchored while only its marker moves', async () => {
+  const switcher = await readFile(path.join(siteRoot, 'src/components/ThemeSwitcher.astro'), 'utf8');
+
+  assert.match(switcher, /theme-switcher-word[^>]*>DAY<\/span>/);
+  assert.match(switcher, /theme-switcher-next[^>]*>NIGHT<\/span>/);
+  assert.doesNotMatch(switcher, /\.textContent\s*=\s*isDark/);
+});
+
+test('theme text tokens meet WCAG AA contrast in both modes', async () => {
+  const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
+  const token = (name) => {
+    const match = styles.match(new RegExp(`--${name}:\\s*light-dark\\((#[\\da-f]{6}),\\s*(#[\\da-f]{6})\\)`, 'i'));
+    assert.ok(match, `missing light-dark color token --${name}`);
+    return { light: match[1], dark: match[2] };
+  };
+  const luminance = (hex) => {
+    const channels = hex.slice(1).match(/.{2}/g).map((value) => Number.parseInt(value, 16) / 255);
+    const linear = channels.map((value) => value <= 0.04045 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4);
+    return 0.2126 * linear[0] + 0.7152 * linear[1] + 0.0722 * linear[2];
+  };
+  const contrast = (foreground, background) => {
+    const values = [luminance(foreground), luminance(background)].sort((a, b) => b - a);
+    return (values[0] + 0.05) / (values[1] + 0.05);
+  };
+
+  const paper = token('paper');
+  const paperBright = token('paper-bright');
+  const readoutSurface = token('readout-surface');
+  assert.match(styles, /\.signal-readout \{[^}]*background:var\(--readout-surface\)/);
+  for (const name of ['ink', 'ink-soft', 'muted', 'signal']) {
+    const colors = token(name);
+    for (const mode of ['light', 'dark']) {
+      assert.ok(contrast(colors[mode], paper[mode]) >= 4.5, `--${name} misses AA contrast in ${mode} mode`);
+      assert.ok(contrast(colors[mode], readoutSurface[mode]) >= 4.5, `--${name} misses AA on the readout in ${mode} mode`);
+    }
+  }
+
+  for (const name of ['state-writing', 'state-lab', 'state-projects', 'state-now']) {
+    const colors = token(name);
+    for (const mode of ['light', 'dark']) {
+      assert.ok(contrast(colors[mode], paper[mode]) >= 4.5, `--${name} misses AA against paper in ${mode} mode`);
+      assert.ok(contrast(colors[mode], paperBright[mode]) >= 4.5, `--${name} misses AA active-control contrast in ${mode} mode`);
+      assert.ok(contrast(colors[mode], readoutSurface[mode]) >= 4.5, `--${name} misses AA on the readout in ${mode} mode`);
+    }
+  }
+});

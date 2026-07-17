@@ -4,7 +4,7 @@
 
 ## Verification
 
-- [ ] `cd site && npm run verify`
+- [ ] `cd site && bun run verify`
 - [ ] Desktop layout checked when UI changed
 - [ ] Mobile layout checked when UI changed
 

@@ -5,6 +5,7 @@ import test from 'node:test';
 import { fileURLToPath } from 'node:url';
 
 const siteRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
+const repoRoot = path.resolve(siteRoot, '..');
 const distRoot = path.join(siteRoot, 'dist');
 
 const readBuilt = (relativePath) => readFile(path.join(distRoot, relativePath), 'utf8');
@@ -128,4 +129,40 @@ test('Memory Wiki is a published and grounded project page', async () => {
   assert.doesNotMatch(html, /Дополнить проверенными возможностями/);
 
   await access(path.join(siteRoot, 'public/projects/memory-wiki/sample-overview.webp'));
+});
+
+test('repository uses Bun as its only JavaScript package manager', async () => {
+  const packageJson = JSON.parse(await readFile(path.join(siteRoot, 'package.json'), 'utf8'));
+  const workflow = await readFile(path.join(repoRoot, '.github/workflows/verify.yml'), 'utf8');
+  const docs = await Promise.all([
+    readFile(path.join(repoRoot, 'README.md'), 'utf8'),
+    readFile(path.join(siteRoot, 'README.md'), 'utf8'),
+    readFile(path.join(repoRoot, 'CONTRIBUTING.md'), 'utf8'),
+  ]);
+
+  assert.equal(packageJson.packageManager, 'bun@1.3.14');
+  assert.equal(packageJson.scripts.verify, 'bun run check && bun run build && bun run test');
+  await access(path.join(siteRoot, 'bun.lock'));
+  for (const obsoleteLockfile of [
+    'bun.lockb',
+    'package-lock.json',
+    'npm-shrinkwrap.json',
+    'pnpm-lock.yaml',
+    'yarn.lock',
+  ]) {
+    await assert.rejects(access(path.join(siteRoot, obsoleteLockfile)));
+  }
+
+  assert.match(
+    workflow,
+    /oven-sh\/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2\.2\.0/,
+  );
+  assert.match(workflow, /bun-version: 1\.3\.14/);
+  assert.match(workflow, /bun install --frozen-lockfile/);
+  assert.match(workflow, /bun run verify/);
+  assert.doesNotMatch(workflow, /npm ci|cache: npm|package-lock\.json/);
+
+  for (const document of docs) assert.doesNotMatch(document, /\bnpm(?:\s|$)/m);
+  assert.match(docs[0], /Bun 1\.3\.14/);
+  assert.match(docs[1], /Bun 1\.3\.14/);
 });

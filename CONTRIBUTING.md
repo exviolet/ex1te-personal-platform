@@ -1,6 +1,6 @@
 # Contributing
 
-This is a personal project, but changes still follow a lightweight reviewable workflow.
+This is a personal project, so changes use a lightweight local branch workflow without pull requests.
 
 ## Branches
 
@@ -28,11 +28,25 @@ content(projects): publish a project story
 
 Prefer a small number of meaningful commits over one commit per file or per edit.
 
-## Pull requests
+## Local merge workflow
 
-1. Run `cd site && bun run verify` locally.
-2. Push the branch and open a pull request into `main`.
-3. Wait for the `Site verify` GitHub Actions check.
-4. Squash-merge the pull request and delete the branch.
+1. Update `main` and create a focused branch:
 
-Visual changes should also be checked at desktop and mobile widths before merge.
+   ```bash
+   git switch main
+   git pull --ff-only
+   git switch -c feat/example
+   ```
+
+2. Make and commit the change on the branch.
+3. Run `cd site && bun run verify` locally. Visual changes should also be checked at desktop and mobile widths.
+4. Merge the completed branch into `main` with an explicit merge commit, then push:
+
+   ```bash
+   git switch main
+   git merge --no-ff feat/example
+   git push origin main
+   git branch -d feat/example
+   ```
+
+GitHub Actions verifies every push to `main`. Topic branches stay local unless a remote backup is useful.

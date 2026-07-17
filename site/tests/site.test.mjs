@@ -166,3 +166,13 @@ test('repository uses Bun as its only JavaScript package manager', async () => {
   assert.match(docs[0], /Bun 1\.3\.14/);
   assert.match(docs[1], /Bun 1\.3\.14/);
 });
+
+test('repository uses local no-ff branch merges without a pull request gate', async () => {
+  const workflow = await readFile(path.join(repoRoot, '.github/workflows/verify.yml'), 'utf8');
+  const contributing = await readFile(path.join(repoRoot, 'CONTRIBUTING.md'), 'utf8');
+
+  assert.doesNotMatch(workflow, /^\s*pull_request:/m);
+  await assert.rejects(access(path.join(repoRoot, '.github/pull_request_template.md')));
+  assert.match(contributing, /git merge --no-ff/);
+  assert.doesNotMatch(contributing, /open a pull request/i);
+});

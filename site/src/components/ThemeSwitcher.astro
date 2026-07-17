@@ -1,0 +1,69 @@
+<button
+  class="theme-switcher"
+  type="button"
+  data-theme-toggle
+  data-mode="light"
+  aria-label="Dark theme"
+  aria-pressed="false"
+>
+  <span class="theme-switcher-word" aria-hidden="true">DAY</span>
+  <span class="theme-switcher-bearing" aria-hidden="true">
+    <span class="theme-switcher-marker"></span>
+  </span>
+  <span class="theme-switcher-word theme-switcher-next" aria-hidden="true">NIGHT</span>
+</button>
+
+<script is:inline>
+  (() => {
+    const root = document.documentElement;
+    const button = document.querySelector('[data-theme-toggle]');
+    const themeColor = document.querySelector('[data-theme-color]');
+    const systemPreference = window.matchMedia('(prefers-color-scheme: dark)');
+    let hasManualOverride = false;
+
+    if (!(button instanceof HTMLButtonElement)) return;
+
+    const readStoredTheme = () => {
+      try {
+        const value = localStorage.getItem('ex1te-theme');
+        return value === 'light' || value === 'dark' ? value : null;
+      } catch {
+        return null;
+      }
+    };
+
+    const applyTheme = (theme, persist = false) => {
+      const isDark = theme === 'dark';
+      root.dataset.theme = theme;
+      root.style.colorScheme = theme;
+      button.dataset.mode = theme;
+      button.setAttribute('aria-pressed', String(isDark));
+
+      const color = themeColor?.getAttribute(`data-${theme}-color`);
+      if (themeColor && color) themeColor.setAttribute('content', color);
+
+      if (persist) {
+        hasManualOverride = true;
+        root.dataset.themeSource = 'manual';
+        try {
+          localStorage.setItem('ex1te-theme', theme);
+          root.dataset.themeSource = 'saved';
+        } catch {
+          // The visual theme still works when storage is unavailable.
+        }
+      }
+    };
+
+    applyTheme(root.dataset.theme === 'dark' ? 'dark' : 'light');
+
+    button.addEventListener('click', () => {
+      root.classList.add('theme-changing');
+      applyTheme(root.dataset.theme === 'dark' ? 'light' : 'dark', true);
+      window.setTimeout(() => root.classList.remove('theme-changing'), 320);
+    });
+
+    systemPreference.addEventListener('change', (event) => {
+      if (!readStoredTheme() && !hasManualOverride) applyTheme(event.matches ? 'dark' : 'light');
+    });
+  })();
+</script>

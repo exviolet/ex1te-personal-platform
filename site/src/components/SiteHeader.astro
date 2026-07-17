@@ -1,4 +1,6 @@
 ---
+import ThemeSwitcher from './ThemeSwitcher.astro';
+
 const nav = [
   ['/writing/', 'Writing'],
   ['/lab/', 'Lab'],
@@ -24,8 +26,11 @@ const nav = [
       <span>ex1te</span>
     </a>
     <div class="author">Бақытжан Избасаров</div>
-    <nav class="site-nav" aria-label="Sections">
-      {nav.map(([href, label]) => <a href={href}>{label}</a>)}
-    </nav>
+    <div class="header-tools">
+      <nav class="site-nav" aria-label="Sections">
+        {nav.map(([href, label]) => <a href={href}>{label}</a>)}
+      </nav>
+      <ThemeSwitcher />
+    </div>
   </div>
 </header>

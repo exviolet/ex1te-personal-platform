@@ -177,6 +177,48 @@ test('repository uses local no-ff branch merges without a pull request gate', as
   assert.doesNotMatch(contributing, /open a pull request/i);
 });
 
+test('mobile navigation exposes a field index without changing the desktop sections', async () => {
+  const header = await readFile(path.join(siteRoot, 'src/components/SiteHeader.astro'), 'utf8');
+  const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
+
+  assert.match(header, /<button[^>]*data-menu-toggle[^>]*aria-expanded="false"[^>]*aria-controls="mobile-field-index"/s);
+  assert.match(header, /id="mobile-field-index"[^>]*data-menu-panel/);
+  assert.match(header, /FIELD INDEX/);
+  assert.equal((header.match(/data-menu-link/g) ?? []).length, 2, 'one shared link template plus its behavior selector are expected');
+  assert.match(header, /const currentState = \(href: string\)/);
+  assert.match(header, /aria-current=\{currentState\(href\)\}/);
+  assert.equal((header.match(/<ThemeSwitcher \/>/g) ?? []).length, 1, 'theme control must not be duplicated');
+  assert.match(styles, /\.mobile-menu-trigger \{[^}]*display:none;/);
+  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.mobile-menu-trigger \{[^}]*display:/);
+  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.header-tools \{[^}]*position:absolute;[^}]*top:100%;/);
+  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.header-tools \{[^}]*left:-13px;[^}]*right:-13px;[^}]*width:auto;[^}]*justify-self:stretch;/);
+  assert.doesNotMatch(styles, /@media \(max-width:720px\)[\s\S]*?\.header-tools \{[^}]*width:100vw;/);
+  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.header-tools \{[^}]*background:var\(--paper-bright\);/);
+  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.mobile-menu-footer \.theme-switcher-control \{[^}]*height:44px;/);
+  assert.match(styles, /\.site-nav a\[aria-current\][\s\S]*?\.site-nav-status \{ color:var\(--ink\);/);
+  assert.match(styles, /@media \(max-width:360px\)[\s\S]*?\.mobile-menu-footer \{[^}]*grid-template-columns:1fr;/);
+  assert.doesNotMatch(styles, /@media \(max-width:720px\)[\s\S]*?\.site-nav \{[^}]*flex-wrap:wrap;/);
+});
+
+test('mobile navigation closes safely and restores focus', async () => {
+  const header = await readFile(path.join(siteRoot, 'src/components/SiteHeader.astro'), 'utf8');
+
+  assert.match(header, /button\.setAttribute\('aria-expanded', String\(open\)\)/);
+  assert.match(header, /panel\.inert = !open/);
+  assert.match(header, /document\.body\.classList\.toggle\('menu-open', open\)/);
+  assert.match(header, /event\.key === 'Escape'/);
+  assert.match(header, /button\.focus\(\)/);
+  assert.match(header, /link\.addEventListener\('click'/);
+  assert.match(header, /!header\.contains\(event\.target\)/);
+  assert.match(header, /matchMedia\('\(max-width:720px\)'\)/);
+  assert.match(header, /document\.addEventListener\('focusin'/);
+  assert.match(header, /let wasMobile = mobileQuery\.matches/);
+  assert.match(header, /nextMobile && panel\.contains\(lastFocusedElement\)/);
+  assert.match(header, /!nextMobile && lastFocusedElement === button/);
+  assert.match(header, /document\.addEventListener\('click'/);
+  assert.doesNotMatch(header, /document\.addEventListener\('pointerdown'/);
+});
+
 test('theme system initializes before paint and exposes an accessible persistent switcher', async () => {
   const home = await readBuilt('index.html');
   const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
@@ -271,6 +313,7 @@ test('theme text tokens meet WCAG AA contrast in both modes', async () => {
     for (const mode of ['light', 'dark']) {
       assert.ok(contrast(colors[mode], paper[mode]) >= 4.5, `--${name} misses AA contrast in ${mode} mode`);
       assert.ok(contrast(colors[mode], readoutSurface[mode]) >= 4.5, `--${name} misses AA on the readout in ${mode} mode`);
+      if (name === 'ink') assert.ok(contrast(colors[mode], paperBright[mode]) >= 4.5, `--ink misses AA in the field index in ${mode} mode`);
     }
   }
 

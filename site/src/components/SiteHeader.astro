@@ -9,9 +9,16 @@ const nav = [
   ['/now/', 'Now'],
   ['/about/', 'About'],
 ] as const;
+
+const currentPath = Astro.url.pathname;
+const currentState = (href: string) => {
+  if (currentPath === href) return 'page';
+  if (currentPath.startsWith(href)) return 'location';
+  return undefined;
+};
 ---
 
-<header class="site-header">
+<header class="site-header" data-site-header>
   <div class="shell header-inner">
     <a class="wordmark" href="/" aria-label="ex1te — home">
       <img
@@ -26,11 +33,123 @@ const nav = [
       <span>ex1te</span>
     </a>
     <div class="author">Бақытжан Избасаров</div>
-    <div class="header-tools">
+    <button
+      class="mobile-menu-trigger"
+      type="button"
+      data-menu-toggle
+      aria-expanded="false"
+      aria-controls="mobile-field-index"
+      aria-label="Open menu"
+    >
+      <span class="mobile-menu-trigger-label">MENU</span>
+      <span class="mobile-menu-glyph" aria-hidden="true">
+        <span></span><span></span><span></span>
+      </span>
+    </button>
+    <div class="header-tools" id="mobile-field-index" data-menu-panel>
+      <div class="mobile-menu-meta" aria-hidden="true">
+        <span>FIELD INDEX / 06</span>
+        <span>PERSONAL PLATFORM</span>
+      </div>
       <nav class="site-nav" aria-label="Sections">
-        {nav.map(([href, label]) => <a href={href}>{label}</a>)}
+        {nav.map(([href, label], index) => (
+          <a href={href} data-menu-link aria-current={currentState(href)}>
+            <span class="site-nav-index">{String(index + 1).padStart(2, '0')}</span>
+            <span class="site-nav-label">{label}</span>
+            <span class="site-nav-status" aria-hidden="true">
+              {currentState(href) === 'location' ? 'SECTION' : currentState(href) === 'page' ? 'CURRENT' : '↗'}
+            </span>
+          </a>
+        ))}
       </nav>
-      <ThemeSwitcher />
+      <div class="mobile-menu-footer">
+        <div class="mobile-menu-signature">
+          <span>Бақытжан Избасаров</span>
+          <small>PERSONAL FIELD STATION / KZ</small>
+        </div>
+        <div class="mobile-theme-station">
+          <span class="mobile-theme-label">DISPLAY MODE</span>
+          <ThemeSwitcher />
+        </div>
+      </div>
     </div>
   </div>
 </header>
+
+<script is:inline>
+  (() => {
+    const header = document.querySelector('[data-site-header]');
+    const button = header?.querySelector('[data-menu-toggle]');
+    const panel = header?.querySelector('[data-menu-panel]');
+    const links = panel?.querySelectorAll('[data-menu-link]');
+    const mobileQuery = window.matchMedia('(max-width:720px)');
+
+    if (!(header instanceof HTMLElement) || !(button instanceof HTMLButtonElement) || !(panel instanceof HTMLElement) || !links) return;
+
+    let open = false;
+    let wasMobile = mobileQuery.matches;
+    let lastFocusedElement = document.activeElement;
+
+    const getDestination = () => panel.querySelector('[aria-current]') ?? links[0];
+
+    const setOpen = (nextOpen, restoreFocus = false) => {
+      open = mobileQuery.matches && nextOpen;
+      header.toggleAttribute('data-menu-open', open);
+      button.setAttribute('aria-expanded', String(open));
+      button.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      document.body.classList.toggle('menu-open', open);
+
+      if (mobileQuery.matches) {
+        panel.inert = !open;
+        panel.setAttribute('aria-hidden', String(!open));
+      } else {
+        panel.inert = false;
+        panel.setAttribute('aria-hidden', 'false');
+      }
+
+      if (open) {
+        const destination = getDestination();
+        if (destination instanceof HTMLElement) destination.focus();
+      } else if (restoreFocus) {
+        button.focus();
+      }
+    };
+
+    const syncViewport = () => {
+      const nextMobile = mobileQuery.matches;
+      const focusTrigger = nextMobile && panel.contains(lastFocusedElement);
+      const focusSection = !nextMobile && lastFocusedElement === button;
+
+      setOpen(false);
+
+      if (nextMobile !== wasMobile) {
+        if (focusTrigger) {
+          button.focus();
+        } else if (focusSection) {
+          const destination = getDestination();
+          if (destination instanceof HTMLElement) destination.focus();
+        }
+      }
+
+      wasMobile = nextMobile;
+    };
+
+    button.addEventListener('click', () => setOpen(!open));
+    links.forEach((link) => link.addEventListener('click', () => setOpen(false)));
+
+    document.addEventListener('keydown', (event) => {
+      if (open && event.key === 'Escape') setOpen(false, true);
+    });
+
+    document.addEventListener('focusin', (event) => {
+      if (event.target instanceof HTMLElement) lastFocusedElement = event.target;
+    });
+
+    document.addEventListener('click', (event) => {
+      if (open && event.target instanceof Node && !header.contains(event.target)) setOpen(false, true);
+    });
+
+    mobileQuery.addEventListener('change', syncViewport);
+    syncViewport();
+  })();
+</script>

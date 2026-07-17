@@ -1,0 +1,31 @@
+---
+const nav = [
+  ['/writing/', 'Writing'],
+  ['/lab/', 'Lab'],
+  ['/projects/', 'Projects'],
+  ['/uses/', 'Uses'],
+  ['/now/', 'Now'],
+  ['/about/', 'About'],
+] as const;
+---
+
+<header class="site-header">
+  <div class="shell header-inner">
+    <a class="wordmark" href="/" aria-label="ex1te — home">
+      <img
+        class="brand-mark"
+        src="/identity/ex1te-header-mark.webp"
+        width="128"
+        height="128"
+        alt=""
+        decoding="async"
+        fetchpriority="high"
+      />
+      <span>ex1te</span>
+    </a>
+    <div class="author">Бақытжан Избасаров</div>
+    <nav class="site-nav" aria-label="Sections">
+      {nav.map(([href, label]) => <a href={href}>{label}</a>)}
+    </nav>
+  </div>
+</header>

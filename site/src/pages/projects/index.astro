@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const entries = await getCollection('projects', ({ data }) => !data.draft);
+---
+
+<BaseLayout title="Projects — ex1te" description="Долговечные проекты и инструменты Бакытжана.">
+  <section class="page-shell">
+    <div class="page-kicker">Projects / Active · Maintenance · Archived</div>
+    <h1 class="page-title">Things that became durable.</h1>
+    <p class="page-lead">Самостоятельные инструменты и интерфейсы, пережившие стадию одноразового эксперимента.</p>
+    <hr class="page-rule" />
+    {entries.length > 0 ? (
+      <div class="entry-list">
+        {entries.map((entry) => (
+          <a class="entry-card" href={`/projects/${entry.id}/`}>
+            <small>{entry.data.lang} · {entry.data.status}</small>
+            <div><h2>{entry.data.title}</h2><p>{entry.data.description}</p></div>
+            <span>Open →</span>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state"><strong>Two project pages are in draft.</strong><p>Memory Wiki и Rewrite Desktop уже проходят schema validation, но пока не считаются опубликованными.</p></div>
+    )}
+  </section>
+</BaseLayout>

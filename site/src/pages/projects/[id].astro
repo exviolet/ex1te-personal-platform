@@ -1,0 +1,90 @@
+---
+import type { CollectionEntry } from 'astro:content';
+import { getCollection, render } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+export async function getStaticPaths() {
+  const entries = await getCollection('projects', ({ data }) => !data.draft);
+  return entries.map((entry) => ({ params: { id: entry.id }, props: { entry } }));
+}
+
+interface Props { entry: CollectionEntry<'projects'> }
+const { entry } = Astro.props;
+const { Content } = await render(entry);
+const started = entry.data.started
+  ? new Intl.DateTimeFormat('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' }).format(entry.data.started)
+  : null;
+const visibilityLabel = {
+  local: 'Host-local',
+  private: 'Private',
+  public: 'Public',
+}[entry.data.visibility];
+---
+
+<BaseLayout title={`${entry.data.title} — ex1te`} description={entry.data.description} lang={entry.data.lang}>
+  <article class="project-page">
+    <header class="page-shell page-shell-wide project-hero">
+      <div class="project-heading">
+        <div class="page-kicker">{entry.data.lang} · Project · {entry.data.status}</div>
+        <h1 class="page-title">{entry.data.title}</h1>
+        <p class="page-lead">{entry.data.description}</p>
+        {(entry.data.repo || entry.data.demo) && (
+          <div class="project-links">
+            {entry.data.repo && <a class="button primary" href={entry.data.repo}>Source ↗</a>}
+            {entry.data.demo && <a class="button" href={entry.data.demo}>Open demo ↗</a>}
+          </div>
+        )}
+      </div>
+
+      <aside class="project-facts" aria-label="Project facts">
+        <div><small>Status</small><strong>{entry.data.status}</strong></div>
+        <div><small>Started</small><strong>{started ?? 'Not recorded'}</strong></div>
+        <div><small>Surface</small><strong>{visibilityLabel}</strong></div>
+        {entry.data.stack.length > 0 && (
+          <div class="project-stack"><small>Stack</small><p>{entry.data.stack.map((item) => <span>{item}</span>)}</p></div>
+        )}
+      </aside>
+    </header>
+
+    {entry.data.flow.length > 0 && (
+      <section class="shell project-system" data-project-flow aria-label="Project data flow">
+        <div class="project-system-head"><span>System map</span><span>{entry.data.flow.length} stages / static pipeline</span></div>
+        <div class="project-flow" style={`--flow-count: ${entry.data.flow.length}`}>
+          {entry.data.flow.map((step, index) => (
+            <div class="project-flow-step">
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <strong>{step.label}</strong>
+              <p>{step.detail}</p>
+            </div>
+          ))}
+        </div>
+        {entry.data.metrics.length > 0 && (
+          <div class="project-metrics" aria-label="Current build snapshot">
+            {entry.data.metrics.map((metric) => (
+              <div><strong>{metric.value}</strong><span>{metric.label}</span></div>
+            ))}
+          </div>
+        )}
+      </section>
+    )}
+
+    {entry.data.cover && (
+      <figure class="shell project-cover">
+        <img
+          src={entry.data.cover}
+          width="1200"
+          height="900"
+          alt={entry.data.coverAlt ?? ''}
+          loading="lazy"
+          decoding="async"
+        />
+        {entry.data.coverCaption && <figcaption>{entry.data.coverCaption}</figcaption>}
+      </figure>
+    )}
+
+    <section class="page-shell project-article">
+      {entry.data.note && <aside class="project-note"><small>Boundary note</small><p>{entry.data.note}</p></aside>}
+      <div class="prose project-prose"><Content /></div>
+    </section>
+  </article>
+</BaseLayout>

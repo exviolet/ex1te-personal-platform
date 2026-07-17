@@ -1,0 +1,72 @@
+---
+import SiteFooter from '../components/SiteFooter.astro';
+import SiteHeader from '../components/SiteHeader.astro';
+import '../styles/global.css';
+
+interface Props {
+  title?: string;
+  description?: string;
+  lang?: 'ru' | 'en' | 'kk';
+  image?: string;
+}
+
+const {
+  title = 'ex1te — Systems for real work.',
+  description = 'Мысли, проекты и эксперименты об инструментах, AI workflow и системах для реальной работы.',
+  lang = 'ru',
+  image = '/identity/ex1te-og.png',
+} = Astro.props;
+
+const site = Astro.site ?? new URL('https://ex1te.local');
+const canonicalURL = new URL(Astro.url.pathname, site);
+const socialImageURL = new URL(image, site);
+const personImageURL = new URL('/identity/ex1te-avatar-512.webp', site);
+const personSchema = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: 'Бақытжан Избасаров',
+  alternateName: ['Бакытжан Избасаров', 'Bakytzhan Izbassarov', 'ex1te'],
+  url: site.toString(),
+  image: personImageURL.toString(),
+};
+---
+
+<!doctype html>
+<html lang={lang}>
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="color-scheme" content="light" />
+    <meta name="generator" content={Astro.generator} />
+
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="icon" type="image/png" sizes="32x32" href="/identity/favicon-32.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/identity/apple-touch-icon.png" />
+    <link rel="alternate" type="application/rss+xml" title="ex1te RSS" href="/rss.xml" />
+
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="ex1te" />
+    <meta property="og:locale" content={lang === 'ru' ? 'ru_RU' : lang === 'kk' ? 'kk_KZ' : 'en_US'} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:image" content={socialImageURL} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="ex1te — illustrated portrait and Systems for real work." />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={socialImageURL} />
+
+    <script type="application/ld+json" is:inline set:html={JSON.stringify(personSchema)} />
+    <title>{title}</title>
+  </head>
+  <body>
+    <SiteHeader />
+    <main id="top"><slot /></main>
+    <SiteFooter />
+  </body>
+</html>

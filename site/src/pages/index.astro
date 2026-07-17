@@ -1,0 +1,72 @@
+---
+import StatusStrip from '../components/StatusStrip.astro';
+import SteppeSignal from '../components/SteppeSignal.astro';
+import BaseLayout from '../layouts/BaseLayout.astro';
+---
+
+<BaseLayout>
+  <section class="shell hero">
+    <div class="hero-copy">
+      <div>
+        <div class="coordinate-line"><span>Personal field station</span></div>
+        <h1 class="hero-title">Systems for<span class="editorial">real work.</span></h1>
+        <p class="intro">
+          Здесь я собираю мысли, проекты и эксперименты о том, как инструменты меняют способ думать и работать. Сейчас я строю личную рабочую среду вокруг <strong>AI-агентов, терминала, заметок и автоматизации</strong> — и пишу о том, что действительно помогает, а что только создаёт шум.
+        </p>
+        <div class="hero-actions">
+          <a class="button primary" href="/writing/"><span>Start here</span><span>↘</span></a>
+          <a class="button" href="/lab/"><span>Enter the lab</span><span>→</span></a>
+        </div>
+      </div>
+
+      <div class="start-here" aria-label="Recommended pages">
+        <a class="start-item" href="/writing/"><small>RU · Essay</small><strong>Мой личный AI Workflow</strong><em>In progress</em></a>
+        <a class="start-item" href="/uses/"><small>RU · Uses</small><strong>Arch, Niri, tmux, Neovim, Hermes</strong><em>Living page</em></a>
+        <a class="start-item" href="/projects/memory-wiki/"><small>RU · Project</small><strong>Memory Wiki: карта прошлых разговоров</strong><em>Published</em></a>
+      </div>
+    </div>
+
+    <SteppeSignal />
+  </section>
+
+  <StatusStrip />
+
+  <section class="content-section">
+    <div class="shell section-grid">
+      <div class="section-intro">
+        <div class="section-kicker">01 / Writing</div>
+        <h2>Field notes in progress</h2>
+        <p>Короткие наблюдения, длинные эссе и практические выводы. Публикации появятся после содержательной проверки.</p>
+      </div>
+      <div class="writing-list">
+        <a class="writing-row" href="/writing/"><time>RU · ESSAY</time><strong>Мой личный AI Workflow</strong><span>Draft</span></a>
+        <a class="writing-row" href="/now/"><time>RU · NOW</time><strong>What I am testing right now</strong><span>Living</span></a>
+        <a class="writing-row" href="/uses/"><time>RU · USES</time><strong>Инструменты, которые остались</strong><span>Living</span></a>
+      </div>
+    </div>
+  </section>
+
+  <section class="content-section">
+    <div class="shell section-grid">
+      <div class="section-intro">
+        <div class="section-kicker">02 / Projects</div>
+        <h2>Things with visible edges</h2>
+        <p>Проекты и эксперименты с понятной целью, ограничениями и честным текущим статусом.</p>
+      </div>
+      <div class="lab-grid">
+        <a class="lab-card featured" href="/projects/memory-wiki/">
+          <div><small>RU · Active project</small><h3>Memory Wiki</h3><p>Локальная browsable-карта прошлых разговоров и решений. Эксперимент о том, как память агента может оставаться понятной человеку.</p></div>
+          <div class="meta"><span>Python · Static HTML</span><span>Read project →</span></div>
+        </a>
+        <a class="lab-card" href="/projects/">
+          <div><small>RU · Maintenance</small><h3>Rewrite Desktop</h3><p>Интерфейс, который развивается через ежедневное использование вместо выдуманного roadmap.</p></div>
+          <div class="meta"><span>UI systems</span><span>Project draft →</span></div>
+        </a>
+        <a class="lab-card" href="/uses/">
+          <div><small>RU · Living page</small><h3>Uses</h3><p>Arch, Niri, tmux, Neovim, Hermes, Claude Code и Codex — с объяснением роли каждого инструмента.</p></div>
+          <div class="meta"><span>Updated often</span><span>Open →</span></div>
+        </a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>

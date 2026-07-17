@@ -1,0 +1,100 @@
+<aside class="signal-card" data-steppe-signal data-state="writing" aria-label="Interactive Steppe Signal">
+  <div class="signal-head">
+    <span>Steppe Signal / FS—004</span>
+    <span class="live">Live object</span>
+  </div>
+
+  <div class="signal-stage">
+    <svg class="signal-svg" viewBox="0 0 620 690" role="img" aria-label="Abstract steppe landscape and compass">
+      <line class="axis" x1="310" y1="55" x2="310" y2="602" />
+      <line class="axis" x1="64" y1="315" x2="556" y2="315" />
+      <circle class="orbit" cx="310" cy="315" r="178" />
+      <circle class="orbit" cx="310" cy="315" r="119" />
+      <circle class="sun-halo" cx="310" cy="212" r="79" />
+      <circle class="sun-halo" cx="310" cy="212" r="57" />
+      <circle class="sun-disc" cx="310" cy="212" r="35" />
+      <path class="terrain-a" d="M0,450 C98,375 203,389 309,421 C421,455 505,395 620,344 L620,690 L0,690 Z" />
+      <path class="terrain-b" d="M0,501 C104,442 205,449 316,478 C422,506 514,457 620,422 L620,690 L0,690 Z" />
+      <path class="terrain-c" d="M0,566 C123,505 225,532 331,548 C438,565 519,526 620,501 L620,690 L0,690 Z" />
+      <path class="horizon" d="M0,450 C98,375 203,389 309,421 C421,455 505,395 620,344" />
+      <path class="needle" d="M310 280 L322 318 L310 350 L298 318 Z" />
+      <circle cx="310" cy="315" r="6" fill="var(--ink)" />
+    </svg>
+
+    <button class="signal-node node-writing active" type="button" data-section="writing">Writing</button>
+    <button class="signal-node node-lab" type="button" data-section="lab">Lab</button>
+    <button class="signal-node node-projects" type="button" data-section="projects">Projects</button>
+    <button class="signal-node node-now" type="button" data-section="now">Now</button>
+
+    <div class="signal-readout" aria-live="polite">
+      <div>
+        <small data-signal-kicker>Bearing 342° / Writing</small>
+        <strong data-signal-title>Ideas that survived contact with work.</strong>
+        <p data-signal-copy>Эссе, технические заметки и наблюдения из реального workflow — без необходимости превращать каждую мысль в большой гайд.</p>
+      </div>
+      <div class="signal-index" data-signal-index>01 / 04</div>
+    </div>
+  </div>
+</aside>
+
+<script>
+  const states = {
+    writing: {
+      kicker: 'Bearing 342° / Writing',
+      title: 'Ideas that survived contact with work.',
+      copy: 'Эссе, технические заметки и наблюдения из реального workflow — без необходимости превращать каждую мысль в большой гайд.',
+      index: '01 / 04',
+    },
+    lab: {
+      kicker: 'Bearing 059° / Lab',
+      title: 'Small experiments, visible edges.',
+      copy: 'Прототипы, agent pipelines и локальные инструменты. Показываю не только результат, но и границы того, что сработало.',
+      index: '02 / 04',
+    },
+    projects: {
+      kicker: 'Bearing 142° / Projects',
+      title: 'Things that became durable.',
+      copy: 'Проекты, пережившие стадию одноразового скрипта: зачем они существуют, как устроены и чему научили.',
+      index: '03 / 04',
+    },
+    now: {
+      kicker: 'Bearing 216° / Now',
+      title: 'The current edge of attention.',
+      copy: 'Короткая живая страница о том, что я сейчас исследую, строю, читаю и сознательно откладываю.',
+      index: '04 / 04',
+    },
+  } as const;
+
+  const signal = document.querySelector<HTMLElement>('[data-steppe-signal]');
+
+  if (signal) {
+    const nodes = [...signal.querySelectorAll<HTMLButtonElement>('[data-section]')];
+    const kicker = signal.querySelector<HTMLElement>('[data-signal-kicker]');
+    const title = signal.querySelector<HTMLElement>('[data-signal-title]');
+    const copy = signal.querySelector<HTMLElement>('[data-signal-copy]');
+    const index = signal.querySelector<HTMLElement>('[data-signal-index]');
+
+    const selectState = (name: keyof typeof states) => {
+      const state = states[name];
+      signal.dataset.state = name;
+      nodes.forEach((node) => node.classList.toggle('active', node.dataset.section === name));
+      if (kicker) kicker.textContent = state.kicker;
+      if (title) title.textContent = state.title;
+      if (copy) copy.textContent = state.copy;
+      if (index) index.textContent = state.index;
+    };
+
+    nodes.forEach((node) => {
+      node.addEventListener('click', () => {
+        const name = node.dataset.section;
+        if (name && name in states) selectState(name as keyof typeof states);
+      });
+    });
+
+    signal.addEventListener('pointermove', (event) => {
+      const rect = signal.getBoundingClientRect();
+      signal.style.setProperty('--pointer-x', `${((event.clientX - rect.left) / rect.width) * 100}%`);
+      signal.style.setProperty('--pointer-y', `${((event.clientY - rect.top) / rect.height) * 100}%`);
+    });
+  }
+</script>

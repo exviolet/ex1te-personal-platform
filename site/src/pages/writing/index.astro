@@ -1,0 +1,29 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const entries = (await getCollection('writing', ({ data }) => !data.draft))
+  .sort((a, b) => (b.data.published?.getTime() ?? 0) - (a.data.published?.getTime() ?? 0));
+---
+
+<BaseLayout title="Writing — ex1te" description="Эссе, заметки и практические руководства Бакытжана.">
+  <section class="page-shell">
+    <div class="page-kicker">Writing / RU · EN · KK</div>
+    <h1 class="page-title">Ideas that survived contact with work.</h1>
+    <p class="page-lead">Эссе, короткие заметки и руководства. Материал публикуется только тогда, когда в нём есть проверенная мысль, а не просто завершённый черновик.</p>
+    <hr class="page-rule" />
+    {entries.length > 0 ? (
+      <div class="entry-list">
+        {entries.map((entry) => (
+          <a class="entry-card" href={`/writing/${entry.id}/`}>
+            <small>{entry.data.lang} · {entry.data.kind}</small>
+            <div><h2>{entry.data.title}</h2><p>{entry.data.description}</p></div>
+            <span>{entry.data.published?.toLocaleDateString('ru-RU')}</span>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state"><strong>First essay is being written.</strong><p>«Мой личный AI Workflow» уже лежит в Content Collection как draft и появится здесь после содержательной редакции.</p></div>
+    )}
+  </section>
+</BaseLayout>

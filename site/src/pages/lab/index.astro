@@ -1,0 +1,28 @@
+---
+import { getCollection } from 'astro:content';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+
+const entries = await getCollection('lab', ({ data }) => !data.draft);
+---
+
+<BaseLayout title="Lab — ex1te" description="Эксперименты, прототипы и проверки гипотез.">
+  <section class="page-shell">
+    <div class="page-kicker">Lab / Experiments</div>
+    <h1 class="page-title">Small experiments, visible edges.</h1>
+    <p class="page-lead">Здесь живут гипотезы и прототипы до того, как они станут самостоятельными проектами — вместе с ограничениями и тем, что не сработало.</p>
+    <hr class="page-rule" />
+    {entries.length > 0 ? (
+      <div class="entry-list">
+        {entries.map((entry) => (
+          <a class="entry-card" href={`/lab/${entry.id}/`}>
+            <small>{entry.data.lang} · {entry.data.status}</small>
+            <div><h2>{entry.data.title}</h2><p>{entry.data.description}</p></div>
+            <span>Open →</span>
+          </a>
+        ))}
+      </div>
+    ) : (
+      <div class="empty-state"><strong>The lab is being prepared.</strong><p>Первые experiment notes появятся после переноса реальных рабочих материалов, а не как демонстрационный контент.</p></div>
+    )}
+  </section>
+</BaseLayout>

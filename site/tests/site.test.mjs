@@ -224,6 +224,16 @@ test('theme bearing keeps day and night labels anchored while only its marker mo
   assert.doesNotMatch(switcher, /\.textContent\s*=\s*isDark/);
 });
 
+test('theme bearing highlights the label matching its active mode', async () => {
+  const switcher = await readFile(path.join(siteRoot, 'src/components/ThemeSwitcher.astro'), 'utf8');
+  const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
+
+  assert.match(switcher, /theme-switcher-day[^>]*>DAY<\/span>/);
+  assert.match(switcher, /theme-switcher-night[^>]*>NIGHT<\/span>/);
+  assert.match(styles, /\.theme-switcher\[data-mode=['"]light['"]\] \.theme-switcher-day/);
+  assert.match(styles, /\.theme-switcher\[data-mode=['"]dark['"]\] \.theme-switcher-night/);
+});
+
 test('theme text tokens meet WCAG AA contrast in both modes', async () => {
   const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
   const token = (name) => {

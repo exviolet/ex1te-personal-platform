@@ -136,8 +136,9 @@ button { font: inherit; }
   transition: border-color .18s ease, background .18s ease, transform .18s ease;
 }
 .theme-switcher:hover { border-color: var(--ink); background: var(--paper-bright); transform: translateY(-1px); }
-.theme-switcher-word { font-size: 8px; font-weight: 700; letter-spacing: .08em; line-height: 1; }
-.theme-switcher-next { color: var(--muted); font-weight: 500; }
+.theme-switcher-word { color:var(--muted); font-size:8px; font-weight:500; letter-spacing:.08em; line-height:1; }
+.theme-switcher[data-mode='light'] .theme-switcher-day,
+.theme-switcher[data-mode='dark'] .theme-switcher-night { color:var(--ink); font-weight:700; }
 .theme-switcher-bearing { position: relative; width: 30px; height: 10px; }
 .theme-switcher-bearing::before,
 .theme-switcher-bearing::after { content: ""; position: absolute; top: 2px; width: 1px; height: 6px; background: var(--theme-control-track); }

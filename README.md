@@ -6,7 +6,7 @@
 
 ```text
 ex1te-personal-platform/
-├── .github/       # CI and pull request defaults
+├── .github/       # push-based CI configuration
 ├── sketches/      # четыре HTML-прототипа и Content Blueprint
 ├── site/          # production Astro application
 └── CONTRIBUTING.md
@@ -15,7 +15,7 @@ ex1te-personal-platform/
 - [Content Blueprint](./sketches/CONTENT-BLUEPRINT.md)
 - [Current visual source — 004 Editorial Field Station](./sketches/004-editorial-field-station/index.html)
 - [Astro application](./site/README.md)
-- [Git and pull request workflow](./CONTRIBUTING.md)
+- [Local Git branch workflow](./CONTRIBUTING.md)
 
 ## Current production foundation
 

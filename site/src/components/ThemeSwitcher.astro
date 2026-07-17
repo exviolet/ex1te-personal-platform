@@ -1,69 +1,94 @@
-<button
+<fieldset
   class="theme-switcher"
-  type="button"
   data-theme-toggle
-  data-mode="light"
-  aria-label="Dark theme"
-  aria-pressed="false"
+  data-mode="system"
 >
-  <span class="theme-switcher-word theme-switcher-day" aria-hidden="true">DAY</span>
-  <span class="theme-switcher-bearing" aria-hidden="true">
-    <span class="theme-switcher-marker"></span>
+  <legend class="theme-switcher-legend">Theme preference</legend>
+  <span class="theme-switcher-control">
+    <span class="theme-switcher-options">
+      <label class="theme-switcher-option theme-switcher-day">
+        <input type="radio" name="theme-preference" value="light" data-theme-option />
+        <span>DAY</span>
+      </label>
+      <label class="theme-switcher-option theme-switcher-system">
+        <input type="radio" name="theme-preference" value="system" data-theme-option checked />
+        <span>SYSTEM</span>
+      </label>
+      <label class="theme-switcher-option theme-switcher-night">
+        <input type="radio" name="theme-preference" value="dark" data-theme-option />
+        <span>NIGHT</span>
+      </label>
+    </span>
+    <span class="theme-switcher-bearing" aria-hidden="true">
+      <span class="theme-switcher-marker"></span>
+    </span>
   </span>
-  <span class="theme-switcher-word theme-switcher-next theme-switcher-night" aria-hidden="true">NIGHT</span>
-</button>
+</fieldset>
 
 <script is:inline>
   (() => {
     const root = document.documentElement;
-    const button = document.querySelector('[data-theme-toggle]');
+    const control = document.querySelector('[data-theme-toggle]');
     const themeColor = document.querySelector('[data-theme-color]');
     const systemPreference = window.matchMedia('(prefers-color-scheme: dark)');
-    let hasManualOverride = false;
+    const validPreferences = new Set(['light', 'system', 'dark']);
 
-    if (!(button instanceof HTMLButtonElement)) return;
+    if (!(control instanceof HTMLFieldSetElement)) return;
 
-    const readStoredTheme = () => {
+    const readStoredPreference = () => {
       try {
         const value = localStorage.getItem('ex1te-theme');
-        return value === 'light' || value === 'dark' ? value : null;
+        return validPreferences.has(value) ? value : null;
       } catch {
         return null;
       }
     };
 
-    const applyTheme = (theme, persist = false) => {
-      const isDark = theme === 'dark';
+    const resolveTheme = (preference) => preference === 'system'
+      ? (systemPreference.matches ? 'dark' : 'light')
+      : preference;
+
+    let currentPreference = readStoredPreference() ?? 'system';
+
+    const applyPreference = (preference, persist = false) => {
+      if (!validPreferences.has(preference)) return;
+
+      currentPreference = preference;
+      const theme = resolveTheme(preference);
       root.dataset.theme = theme;
+      root.dataset.themeSource = preference;
       root.style.colorScheme = theme;
-      button.dataset.mode = theme;
-      button.setAttribute('aria-pressed', String(isDark));
+      control.dataset.mode = preference;
+
+      control.querySelectorAll('[data-theme-option]').forEach((option) => {
+        if (option instanceof HTMLInputElement) option.checked = option.value === preference;
+      });
 
       const color = themeColor?.getAttribute(`data-${theme}-color`);
       if (themeColor && color) themeColor.setAttribute('content', color);
 
       if (persist) {
-        hasManualOverride = true;
-        root.dataset.themeSource = 'manual';
         try {
-          localStorage.setItem('ex1te-theme', theme);
-          root.dataset.themeSource = 'saved';
+          localStorage.setItem('ex1te-theme', preference);
         } catch {
-          // The visual theme still works when storage is unavailable.
+          // The selected preference still works for the current page.
         }
       }
     };
 
-    applyTheme(root.dataset.theme === 'dark' ? 'dark' : 'light');
+    applyPreference(currentPreference);
 
-    button.addEventListener('click', () => {
+    control.addEventListener('change', (event) => {
+      const option = event.target;
+      if (!(option instanceof HTMLInputElement) || !option.matches('[data-theme-option]')) return;
+
       root.classList.add('theme-changing');
-      applyTheme(root.dataset.theme === 'dark' ? 'light' : 'dark', true);
+      applyPreference(option.value, true);
       window.setTimeout(() => root.classList.remove('theme-changing'), 320);
     });
 
-    systemPreference.addEventListener('change', (event) => {
-      if (!readStoredTheme() && !hasManualOverride) applyTheme(event.matches ? 'dark' : 'light');
+    systemPreference.addEventListener('change', () => {
+      if (currentPreference === 'system') applyPreference('system');
     });
   })();
 </script>

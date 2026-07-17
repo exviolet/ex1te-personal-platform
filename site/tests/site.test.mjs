@@ -183,9 +183,12 @@ test('theme system initializes before paint and exposes an accessible persistent
 
   assert.match(home, /name="color-scheme" content="light dark"/);
   assert.match(home, /data-theme-color/);
-  assert.match(home, /data-theme-toggle/);
-  assert.match(home, /aria-label="Dark theme"/);
-  assert.match(home, /aria-pressed="false"/);
+  assert.match(home, /<fieldset[^>]*data-theme-toggle/);
+  assert.match(home, /<legend[^>]*>Theme preference<\/legend>/);
+  assert.match(home, /type="radio"[^>]*value="light"[^>]*data-theme-option/);
+  assert.match(home, /type="radio"[^>]*value="system"[^>]*data-theme-option/);
+  assert.match(home, /type="radio"[^>]*value="dark"[^>]*data-theme-option/);
+  assert.doesNotMatch(home, /aria-pressed=/);
   assert.match(home, /localStorage\.getItem\(['"]ex1te-theme['"]\)/);
   assert.match(home, /localStorage\.setItem\(['"]ex1te-theme['"]/);
   assert.match(home, /matchMedia\(['"]\(prefers-color-scheme: dark\)['"]\)/);
@@ -201,37 +204,45 @@ test('theme system initializes before paint and exposes an accessible persistent
   assert.match(styles, /--theme-control-track:/);
 });
 
-test('theme state semantics survive invalid or unavailable storage', async () => {
+test('theme preference supports light, system, and dark with system as the safe fallback', async () => {
   const layout = await readFile(path.join(siteRoot, 'src/layouts/BaseLayout.astro'), 'utf8');
   const switcher = await readFile(path.join(siteRoot, 'src/components/ThemeSwitcher.astro'), 'utf8');
   const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
 
-  assert.match(layout, /const validSavedTheme = savedTheme === 'light' \|\| savedTheme === 'dark'/);
-  assert.match(layout, /themeSource = validSavedTheme \? 'saved' : 'system'/);
-  assert.match(switcher, /aria-label="Dark theme"/);
-  assert.doesNotMatch(switcher, /setAttribute\(['"]aria-label['"]/);
-  assert.match(switcher, /let hasManualOverride = false/);
-  assert.match(switcher, /hasManualOverride = true/);
-  assert.match(switcher, /!readStoredTheme\(\) && !hasManualOverride/);
-  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.theme-switcher \{[^}]*min-width:44px;[^}]*min-height:44px;/);
+  assert.match(layout, /savedPreference === 'light' \|\| savedPreference === 'system' \|\| savedPreference === 'dark'/);
+  assert.match(layout, /const preference = validSavedPreference \? savedPreference : 'system'/);
+  assert.match(layout, /preference === 'system' \? \(systemDark \? 'dark' : 'light'\) : preference/);
+  assert.match(layout, /root\.dataset\.themeSource = preference/);
+  assert.match(switcher, /new Set\(\['light', 'system', 'dark'\]\)/);
+  assert.match(switcher, /class="theme-switcher-control"/);
+  assert.match(switcher, /let currentPreference = readStoredPreference\(\) \?\? 'system'/);
+  assert.match(switcher, /localStorage\.setItem\('ex1te-theme', preference\)/);
+  assert.match(switcher, /if \(currentPreference === 'system'\) applyPreference\('system'\)/);
+  assert.doesNotMatch(switcher, /hasManualOverride/);
+  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.theme-switcher \{[^}]*min-width:90px;[^}]*min-height:44px;/);
+  assert.match(styles, /@media \(max-width:720px\)[\s\S]*?\.theme-switcher-system span::after \{ content:"SYS";/);
+  assert.match(styles, /\.theme-switcher-options \{[^}]*position:absolute;[^}]*inset:0;/);
+  assert.match(styles, /\.theme-switcher-option \{[^}]*display:flex;[^}]*align-items:flex-start;/);
 });
 
-test('theme bearing keeps day and night labels anchored while only its marker moves', async () => {
+test('theme bearing keeps day, system, and night labels anchored while only its marker moves', async () => {
   const switcher = await readFile(path.join(siteRoot, 'src/components/ThemeSwitcher.astro'), 'utf8');
 
-  assert.match(switcher, /theme-switcher-word[^>]*>DAY<\/span>/);
-  assert.match(switcher, /theme-switcher-next[^>]*>NIGHT<\/span>/);
-  assert.doesNotMatch(switcher, /\.textContent\s*=\s*isDark/);
+  assert.match(switcher, /theme-switcher-day[^>]*>[\s\S]*?<span>DAY<\/span>/);
+  assert.match(switcher, /theme-switcher-system[^>]*>[\s\S]*?<span>SYSTEM<\/span>/);
+  assert.match(switcher, /theme-switcher-night[^>]*>[\s\S]*?<span>NIGHT<\/span>/);
+  assert.doesNotMatch(switcher, /\.textContent\s*=/);
 });
 
 test('theme bearing highlights the label matching its active mode', async () => {
   const switcher = await readFile(path.join(siteRoot, 'src/components/ThemeSwitcher.astro'), 'utf8');
   const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
 
-  assert.match(switcher, /theme-switcher-day[^>]*>DAY<\/span>/);
-  assert.match(switcher, /theme-switcher-night[^>]*>NIGHT<\/span>/);
-  assert.match(styles, /\.theme-switcher\[data-mode=['"]light['"]\] \.theme-switcher-day/);
-  assert.match(styles, /\.theme-switcher\[data-mode=['"]dark['"]\] \.theme-switcher-night/);
+  assert.match(switcher, /control\.dataset\.mode = preference/);
+  assert.match(styles, /html\[data-theme-source=['"]light['"]\] \.theme-switcher-day/);
+  assert.match(styles, /html\[data-theme-source=['"]system['"]\] \.theme-switcher-system/);
+  assert.match(styles, /html\[data-theme-source=['"]dark['"]\] \.theme-switcher-night/);
+  assert.match(styles, /html\[data-theme-source=['"]system['"]\] \.theme-switcher-marker::after[^}]*left:calc\(50%/);
 });
 
 test('theme text tokens meet WCAG AA contrast in both modes', async () => {

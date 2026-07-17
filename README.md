@@ -6,13 +6,16 @@
 
 ```text
 ex1te-personal-platform/
-├── sketches/  # четыре HTML-прототипа и Content Blueprint
-└── site/      # production Astro application
+├── .github/       # CI and pull request defaults
+├── sketches/      # четыре HTML-прототипа и Content Blueprint
+├── site/          # production Astro application
+└── CONTRIBUTING.md
 ```
 
 - [Content Blueprint](./sketches/CONTENT-BLUEPRINT.md)
 - [Current visual source — 004 Editorial Field Station](./sketches/004-editorial-field-station/index.html)
 - [Astro application](./site/README.md)
+- [Git and pull request workflow](./CONTRIBUTING.md)
 
 ## Current production foundation
 

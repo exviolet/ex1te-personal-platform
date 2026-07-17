@@ -42,22 +42,23 @@ const personSchema = {
     <script is:inline>
       (() => {
         const root = document.documentElement;
-        let savedTheme = null;
+        let savedPreference = null;
 
         try {
-          savedTheme = localStorage.getItem('ex1te-theme');
+          savedPreference = localStorage.getItem('ex1te-theme');
         } catch {
           // System preference remains the fallback when storage is unavailable.
         }
 
         const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const validSavedTheme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : null;
-        const theme = validSavedTheme ?? (systemDark ? 'dark' : 'light');
+        const validSavedPreference = savedPreference === 'light' || savedPreference === 'system' || savedPreference === 'dark';
+        const preference = validSavedPreference ? savedPreference : 'system';
+        const theme = preference === 'system' ? (systemDark ? 'dark' : 'light') : preference;
         const themeColor = document.querySelector('[data-theme-color]');
         const color = themeColor?.getAttribute(`data-${theme}-color`);
 
         root.dataset.theme = theme;
-        root.dataset.themeSource = validSavedTheme ? 'saved' : 'system';
+        root.dataset.themeSource = preference;
         root.style.colorScheme = theme;
         if (themeColor && color) themeColor.setAttribute('content', color);
       })();

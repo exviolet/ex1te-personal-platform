@@ -2,15 +2,20 @@
 
 Production application for the ex1te personal platform.
 
+## Requirements
+
+- Bun 1.3.14;
+- Node.js 22.12 or newer.
+
 ## Commands
 
 ```bash
-npm install
-npm run dev
-npm run check
-npm run build
-npm test
-npm run verify
+bun install
+bun run dev
+bun run check
+bun run build
+bun run test
+bun run verify
 ```
 
 ## Content
@@ -41,7 +46,7 @@ The illustrated portrait is the personal logo, `ex1te` is the wordmark, and Step
 Until a domain is selected, builds use `https://ex1te.local` as the canonical base for sitemap and RSS generation. Override it for deployment:
 
 ```bash
-SITE_URL=https://example.com npm run build
+SITE_URL=https://example.com bun run build
 ```
 
 Do not deploy with the placeholder canonical URL.

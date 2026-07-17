@@ -11,6 +11,7 @@ This is a personal project, but changes still follow a lightweight reviewable wo
 - `content/*` — writing and project material;
 - `design/*` — visual and interaction changes;
 - `ci/*` — automation and repository infrastructure;
+- `chore/*` — dependencies and development tooling;
 - `docs/*` — documentation only.
 
 Start each branch from the current `main` and keep it focused on one outcome.
@@ -29,7 +30,7 @@ Prefer a small number of meaningful commits over one commit per file or per edit
 
 ## Pull requests
 
-1. Run `cd site && npm run verify` locally.
+1. Run `cd site && bun run verify` locally.
 2. Push the branch and open a pull request into `main`.
 3. Wait for the `Site verify` GitHub Actions check.
 4. Squash-merge the pull request and delete the branch.

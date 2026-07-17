@@ -31,10 +31,12 @@ ex1te-personal-platform/
 
 ## Verify
 
+Requires Bun 1.3.14 and Node.js 22.12 or newer.
+
 ```bash
 cd site
-npm install
-npm run verify
+bun install
+bun run verify
 ```
 
-`npm run verify` runs Astro type/schema checking, a static production build, and integration tests.
+`bun run verify` runs Astro type/schema checking, a static production build, and integration tests.

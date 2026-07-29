@@ -15,6 +15,7 @@ test('production build emits every MVP route', async () => {
     'index.html',
     'writing/index.html',
     'lab/index.html',
+    'lab/unicode-spinner-playground/index.html',
     'projects/index.html',
     'projects/memory-wiki/index.html',
     'uses/index.html',
@@ -129,6 +130,29 @@ test('Memory Wiki is a published and grounded project page', async () => {
   assert.doesNotMatch(html, /Дополнить проверенными возможностями/);
 
   await access(path.join(siteRoot, 'public/projects/memory-wiki/sample-overview.webp'));
+});
+
+test('Unicode Spinner Playground is a published and grounded Lab experiment', async () => {
+  const source = await readFile(path.join(siteRoot, 'src/content/lab/unicode-spinner-playground.md'), 'utf8');
+  const html = await readBuilt('lab/unicode-spinner-playground/index.html');
+  const labIndex = await readBuilt('lab/index.html');
+  const styles = await readFile(path.join(siteRoot, 'src/styles/global.css'), 'utf8');
+
+  assert.match(source, /^---[\s\S]*?status: complete/m);
+  assert.match(source, /^---[\s\S]*?started: 2026-07-15/m);
+  assert.match(source, /^---[\s\S]*?draft: false/m);
+  assert.match(labIndex, /href="\/lab\/unicode-spinner-playground\/"/);
+
+  assert.match(html, /От Unicode spinner к Rose Curve/);
+  assert.match(html, /unicode-animations/);
+  assert.match(html, /requestAnimationFrame/);
+  assert.match(source, /Math\.cos\(5 \* t\)/);
+  assert.match(html, /78/);
+  assert.match(html, /эксперимент удался/i);
+  assert.doesNotMatch(html, /Черновик раздела|Дополнить после/);
+  assert.match(styles, /\.prose img \{[^}]*display:block;[^}]*max-width:100%;[^}]*height:auto;/);
+
+  await access(path.join(siteRoot, 'public/lab/unicode-spinner-playground.webp'));
 });
 
 test('repository uses Bun as its only JavaScript package manager', async () => {

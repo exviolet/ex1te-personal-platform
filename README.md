@@ -26,7 +26,7 @@ ex1te-personal-platform/
 - interactive `Steppe Signal` component;
 - Writing, Lab, Projects, Uses, Now, and About routes;
 - RSS and sitemap;
-- Memory Wiki published as the first full project page and Unicode Spinner Playground as the first Lab experiment; remaining starter content stays in drafts;
+- Memory Wiki published as the first full project page, Unicode Spinner Playground as the first Lab experiment, and `rn + tmuxp` as the first practical Writing guide; remaining starter content stays in drafts;
 - Node integration tests against the production build.
 
 ## Verify

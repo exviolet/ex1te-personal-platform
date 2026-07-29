@@ -432,6 +432,7 @@ html.theme-changing .lab-card { transition: color .3s ease, background-color .3s
 .prose h2 { margin-top:2.2em; font-family:var(--serif); font-size:40px; font-weight:400; letter-spacing:-.04em; line-height:1; }
 .prose a { text-decoration-color:var(--signal); text-underline-offset:4px; }
 .prose code { padding:.15em .35em; background:var(--paper-bright); border:1px solid var(--line); font-family:var(--mono); font-size:.86em; }
+.prose img { display:block; max-width:100%; height:auto; margin:2em 0 .65em; border:1px solid var(--line); background:var(--media-bg); }
 .prose ul { padding-left:1.2em; }
 
 .page-shell-wide { width:min(1180px,calc(100% - 44px)); }

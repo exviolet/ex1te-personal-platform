@@ -1,5 +1,7 @@
 import assert from 'node:assert/strict';
-import { access, readFile } from 'node:fs/promises';
+import { spawnSync } from 'node:child_process';
+import { access, mkdir, mkdtemp, readFile, rm, writeFile } from 'node:fs/promises';
+import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 import { fileURLToPath } from 'node:url';
@@ -14,6 +16,7 @@ test('production build emits every MVP route', async () => {
   const routes = [
     'index.html',
     'writing/index.html',
+    'writing/rn-tmuxp-workspaces/index.html',
     'lab/index.html',
     'lab/unicode-spinner-playground/index.html',
     'projects/index.html',
@@ -153,6 +156,112 @@ test('Unicode Spinner Playground is a published and grounded Lab experiment', as
   assert.match(styles, /\.prose img \{[^}]*display:block;[^}]*max-width:100%;[^}]*height:auto;/);
 
   await access(path.join(siteRoot, 'public/lab/unicode-spinner-playground.webp'));
+});
+
+test('rn and tmuxp workspaces are documented as a reproducible Writing guide', async () => {
+  const source = await readFile(path.join(siteRoot, 'src/content/writing/rn-tmuxp-workspaces.md'), 'utf8');
+  const html = await readBuilt('writing/rn-tmuxp-workspaces/index.html');
+  const writingIndex = await readBuilt('writing/index.html');
+  const rss = await readBuilt('rss.xml');
+  const sitemap = await readBuilt('sitemap-0.xml');
+  const readme = await readFile(path.join(repoRoot, 'README.md'), 'utf8');
+
+  assert.match(source, /^---[\s\S]*?kind: guide/m);
+  assert.match(source, /^---[\s\S]*?published: 2026-07-29/m);
+  assert.match(source, /^---[\s\S]*?draft: false/m);
+  assert.match(writingIndex, /href="\/writing\/rn-tmuxp-workspaces\/"/);
+  assert.match(rss, /\/writing\/rn-tmuxp-workspaces\//);
+  assert.match(sitemap, /\/writing\/rn-tmuxp-workspaces\//);
+
+  assert.match(html, /rn: проектные tmux-workspaces одной командой/);
+  assert.match(source, /tmux has-session/);
+  assert.match(source, /tmuxp load/);
+  assert.match(source, /rn inspect/);
+  assert.match(source, /fzf/);
+  assert.match(source, /tmux-resurrect/);
+  assert.match(source, /startup_window: root[\s\S]*window_name: root/);
+  assert.match(source, /session_name: "personal-site"/);
+  assert.match(source, /tmux has-session -t "=\$session"/);
+  assert.match(source, /tmux attach-session -t "=\$session"/);
+  assert.match(source, /tmuxp ls --json --full/);
+  assert.match(source, /~\/\.local\/bin.*PATH/);
+  assert.match(source, /cat > \/tmp\/rn-smoke\.yaml/);
+  assert.match(readme, /first practical Writing guide/i);
+
+  assert.doesNotMatch(
+    source,
+    /\/home\/(?!user(?:\/|$))[^/\s]+\/|\/Projects\/(?:Client|Commercial|Company)[_ -]/i,
+  );
+  assert.doesNotMatch(html, /Черновик раздела|Дополнить после/);
+
+  const launcher = source.match(/```bash\n(#!\/usr\/bin\/env bash[\s\S]*?)\n```/);
+  assert.ok(launcher, 'the guide should include an executable launcher snippet');
+  const syntax = spawnSync('bash', ['-n'], { input: launcher[1], encoding: 'utf8' });
+  assert.equal(syntax.status, 0, syntax.stderr);
+
+  const sandbox = await mkdtemp(path.join(os.tmpdir(), 'rn-guide-'));
+  try {
+    const binDir = path.join(sandbox, 'bin');
+    const configRoot = path.join(sandbox, 'config');
+    const configDir = path.join(configRoot, 'tmuxp');
+    const launcherPath = path.join(binDir, 'rn');
+    const tmuxLog = path.join(sandbox, 'tmux.log');
+    await mkdir(binDir);
+    await mkdir(configDir, { recursive: true });
+    await writeFile(launcherPath, launcher[1], { mode: 0o755 });
+    await writeFile(
+      path.join(binDir, 'tmux'),
+      '#!/usr/bin/env bash\nprintf \'%s\\n\' "$*" >> "$RN_TEST_TMUX_LOG"\nif [[ "${1:-}" == "has-session" && "${RN_TEST_SESSION_EXISTS:-1}" == "0" ]]; then exit 1; fi\nexit 0\n',
+      { mode: 0o755 },
+    );
+    await writeFile(
+      path.join(binDir, 'tmuxp'),
+      '#!/usr/bin/env bash\nprintf \'%s\\n\' "$*" >> "$RN_TEST_TMUXP_LOG"\nexit 0\n',
+      { mode: 0o755 },
+    );
+    await writeFile(
+      path.join(configDir, 'app.yaml'),
+      'session_name: "app"\nwindows: []\n',
+    );
+
+    const tmuxpLog = path.join(sandbox, 'tmuxp.log');
+    const env = {
+      ...process.env,
+      PATH: `${binDir}:${process.env.PATH}`,
+      XDG_CONFIG_HOME: configRoot,
+      RN_TEST_TMUX_LOG: tmuxLog,
+      RN_TEST_TMUXP_LOG: tmuxpLog,
+    };
+    const valid = spawnSync('bash', [launcherPath, '--inside', 'app'], { env, encoding: 'utf8' });
+    assert.equal(valid.status, 0, valid.stderr);
+    assert.deepEqual((await readFile(tmuxLog, 'utf8')).trim().split('\n'), [
+      'has-session -t =app',
+      'attach-session -t =app',
+    ]);
+
+    await rm(tmuxLog);
+    const missing = spawnSync('bash', [launcherPath, '--inside', 'app'], {
+      env: { ...env, RN_TEST_SESSION_EXISTS: '0' },
+      encoding: 'utf8',
+    });
+    assert.equal(missing.status, 0, missing.stderr);
+    assert.equal((await readFile(tmuxLog, 'utf8')).trim(), 'has-session -t =app');
+    assert.equal((await readFile(tmuxpLog, 'utf8')).trim(), `load ${path.join(configDir, 'app.yaml')}`);
+
+    await writeFile(
+      path.join(configDir, 'foo#bar.yaml'),
+      'session_name: "foo#bar"\nwindows: []\n',
+    );
+    const unsupported = spawnSync('bash', [launcherPath, '--inside', 'foo#bar'], {
+      env,
+      encoding: 'utf8',
+    });
+    assert.notEqual(unsupported.status, 0);
+    assert.match(unsupported.stderr, /workspace name/);
+    assert.doesNotMatch(launcher[1], /grep .*session_name/);
+  } finally {
+    await rm(sandbox, { recursive: true, force: true });
+  }
 });
 
 test('repository uses Bun as its only JavaScript package manager', async () => {

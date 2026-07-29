@@ -167,6 +167,20 @@ test('repository uses Bun as its only JavaScript package manager', async () => {
   assert.match(docs[1], /Bun 1\.3\.14/);
 });
 
+test('dependency floors exclude the known compromised Astro release', async () => {
+  const packageJson = JSON.parse(await readFile(path.join(siteRoot, 'package.json'), 'utf8'));
+  const lockfile = await readFile(path.join(siteRoot, 'bun.lock'), 'utf8');
+  const workflow = await readFile(path.join(repoRoot, '.github/workflows/verify.yml'), 'utf8');
+
+  assert.equal(packageJson.dependencies.astro, '^7.1.5');
+  assert.equal(packageJson.devDependencies['@astrojs/check'], '^0.9.10');
+  assert.equal(packageJson.overrides['fast-uri'], '3.1.4');
+  assert.doesNotMatch(lockfile, /astro@7\.1\.0/);
+  assert.match(lockfile, /"fast-uri": \["fast-uri@3\.1\.4"/);
+  assert.doesNotMatch(lockfile, /fast-uri@3\.(?:0\.\d+|1\.[0-3])\b/);
+  assert.match(workflow, /run: bun audit[\s\S]*run: bun run verify/);
+});
+
 test('repository uses local no-ff branch merges without a pull request gate', async () => {
   const workflow = await readFile(path.join(repoRoot, '.github/workflows/verify.yml'), 'utf8');
   const contributing = await readFile(path.join(repoRoot, 'CONTRIBUTING.md'), 'utf8');

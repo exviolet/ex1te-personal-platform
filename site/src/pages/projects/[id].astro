@@ -2,6 +2,7 @@
 import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import ReadingNavigation from '../../components/ReadingNavigation.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('projects', ({ data }) => !data.draft);
@@ -10,7 +11,7 @@ export async function getStaticPaths() {
 
 interface Props { entry: CollectionEntry<'projects'> }
 const { entry } = Astro.props;
-const { Content } = await render(entry);
+const { Content, headings } = await render(entry);
 const started = entry.data.started
   ? new Intl.DateTimeFormat('ru-RU', { year: 'numeric', month: 'long', day: 'numeric' }).format(entry.data.started)
   : null;
@@ -22,7 +23,7 @@ const visibilityLabel = {
 ---
 
 <BaseLayout title={`${entry.data.title} — ex1te`} description={entry.data.description} lang={entry.data.lang}>
-  <article class="project-page">
+  <article class="project-page" id="reading-top" data-reading-page>
     <header class="page-shell page-shell-wide project-hero">
       <div class="project-heading">
         <div class="page-kicker">{entry.data.lang} · Project · {entry.data.status}</div>
@@ -83,8 +84,11 @@ const visibilityLabel = {
     )}
 
     <section class="page-shell project-article">
-      {entry.data.note && <aside class="project-note"><small>Boundary note</small><p>{entry.data.note}</p></aside>}
-      <div class="prose project-prose"><Content /></div>
+      <div class="project-rail">
+        {entry.data.note && <aside class="project-note"><small>Boundary note</small><p>{entry.data.note}</p></aside>}
+        <ReadingNavigation headings={headings} />
+      </div>
+      <div class="prose project-prose reading-content" data-reading-content><Content /></div>
     </section>
   </article>
 </BaseLayout>

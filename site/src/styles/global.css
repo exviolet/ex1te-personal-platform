@@ -474,6 +474,12 @@ html.theme-changing .lab-card { transition: color .3s ease, background-color .3s
 .prose pre { overflow-x:auto; padding:18px; border:1px solid var(--ink); background:var(--inverse-bg); color:var(--inverse-ink); font:13px/1.6 var(--mono); }
 .prose pre code { padding:0; border:0; background:transparent; color:inherit; }
 .prose blockquote { margin:2em 0; padding:2px 0 2px 22px; border-left:3px solid var(--signal); color:var(--muted); font-family:var(--serif); font-size:24px; }
+.prose hr {
+  height:1px;
+  margin:68px 0;
+  border:0;
+  background:linear-gradient(to right,var(--signal) 0 48px,var(--line) 48px 100%);
+}
 
 .empty-state { margin-top:0; padding:30px; border:1px solid var(--ink); background:var(--surface-soft); }
 .empty-state strong { display:block; font-family:var(--serif); font-size:30px; font-weight:400; }

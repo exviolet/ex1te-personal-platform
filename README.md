@@ -21,7 +21,7 @@ ex1te-personal-platform/
 
 - Astro 7 and strict TypeScript;
 - build-time Content Collections for `writing`, `lab`, and `projects`;
-- responsive Editorial Field Station homepage;
+- responsive Editorial Field Station homepage with real-content discovery, current work directions, and visible topic tags;
 - portrait-based personal identity with favicon and Open Graph assets;
 - interactive `Steppe Signal` component;
 - desktop reading routes with heading indexes, active-section tracking, progress, and return-to-top controls;

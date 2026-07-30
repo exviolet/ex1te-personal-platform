@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ReadingNavigation from '../../components/ReadingNavigation.astro';
+import TagList from '../../components/TagList.astro';
 
 export async function getStaticPaths() {
   const entries = await getCollection('projects', ({ data }) => !data.draft);
@@ -29,6 +30,7 @@ const visibilityLabel = {
         <div class="page-kicker">{entry.data.lang} · Project · {entry.data.status}</div>
         <h1 class="page-title">{entry.data.title}</h1>
         <p class="page-lead">{entry.data.description}</p>
+        <TagList tags={entry.data.tags} />
         {(entry.data.repo || entry.data.demo) && (
           <div class="project-links">
             {entry.data.repo && <a class="button primary" href={entry.data.repo}>Source ↗</a>}

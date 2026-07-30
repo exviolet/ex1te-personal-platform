@@ -1,0 +1,96 @@
+---
+import type { MarkdownHeading } from 'astro';
+
+interface Props {
+  headings: MarkdownHeading[];
+}
+
+const { headings } = Astro.props;
+const items = headings.filter(({ depth }) => depth === 2 || depth === 3);
+---
+
+{items.length > 0 && (
+  <>
+    <aside class="reading-navigation-desktop" data-reading-navigation aria-label="Навигация по материалу">
+      <div class="reading-navigation-head">
+        <span>Reading route</span>
+        <span>{String(items.length).padStart(2, '0')} bearings</span>
+      </div>
+      <div class="reading-progress-track" aria-hidden="true">
+        <span data-reading-progress></span>
+      </div>
+      <ol class="reading-navigation-list">
+        {items.map((heading, index) => (
+          <li data-depth={heading.depth}>
+            <a href={`#${heading.slug}`} aria-current={index === 0 ? 'location' : undefined}>
+              <span>{String(index + 1).padStart(2, '0')}</span>
+              <span>{heading.text}</span>
+            </a>
+          </li>
+        ))}
+      </ol>
+      <a class="reading-top" data-reading-top href="#reading-top">
+        <span>Return</span>
+        <strong>↑ Top</strong>
+      </a>
+    </aside>
+
+  </>
+)}
+
+<script is:inline>
+  (() => {
+    const initializeReadingNavigation = () => {
+      const page = document.querySelector('[data-reading-page]');
+      const content = page?.querySelector('[data-reading-content]');
+      const navigationRoots = document.querySelectorAll('[data-reading-navigation]');
+
+      if (!(page instanceof HTMLElement) || !(content instanceof HTMLElement) || navigationRoots.length === 0) return;
+
+      const links = [...document.querySelectorAll('[data-reading-navigation] a[href^="#"]')]
+        .filter((link) => link instanceof HTMLAnchorElement && link.getAttribute('href') !== '#reading-top');
+      const headings = [...new Set(links.map((link) => {
+        const href = link.getAttribute('href');
+        return href ? document.getElementById(href.slice(1)) : null;
+      }))].filter((heading) => heading instanceof HTMLElement);
+      const progressBars = document.querySelectorAll('[data-reading-progress]');
+      const topLinks = document.querySelectorAll('[data-reading-top]');
+      let frame = 0;
+
+      const update = () => {
+        frame = 0;
+        const readingOffset = 150;
+        const activeHeading = headings.reduce((active, heading) => {
+          return heading.getBoundingClientRect().top <= readingOffset ? heading : active;
+        }, headings[0]);
+        const activeHash = activeHeading ? `#${activeHeading.id}` : '';
+
+        links.forEach((link) => {
+          if (link.getAttribute('href') === activeHash) link.setAttribute('aria-current', 'location');
+          else link.removeAttribute('aria-current');
+        });
+
+        const contentRect = content.getBoundingClientRect();
+        const distance = Math.max(content.offsetHeight - window.innerHeight + readingOffset, 1);
+        const progress = Math.min(Math.max((readingOffset - contentRect.top) / distance, 0), 1);
+        progressBars.forEach((bar) => { bar.style.transform = `scaleX(${progress})`; });
+        topLinks.forEach((link) => { link.toggleAttribute('data-visible', progress > 0.08); });
+      };
+
+      const requestUpdate = () => {
+        if (!frame) frame = window.requestAnimationFrame(update);
+      };
+
+      window.addEventListener('scroll', requestUpdate, { passive: true });
+      window.addEventListener('resize', requestUpdate, { passive: true });
+      window.addEventListener('hashchange', requestUpdate);
+      update();
+    };
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeReadingNavigation, { once: true });
+    } else {
+      initializeReadingNavigation();
+    }
+  })();
+</script>

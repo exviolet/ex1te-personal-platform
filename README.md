@@ -24,6 +24,7 @@ ex1te-personal-platform/
 - responsive Editorial Field Station homepage;
 - portrait-based personal identity with favicon and Open Graph assets;
 - interactive `Steppe Signal` component;
+- desktop reading routes with heading indexes, active-section tracking, progress, and return-to-top controls;
 - Writing, Lab, Projects, Uses, Now, and About routes;
 - RSS and sitemap;
 - Memory Wiki published as the first full project page, Unicode Spinner Playground as the first Lab experiment, and `rn + tmuxp` as the first practical Writing guide; remaining starter content stays in drafts;

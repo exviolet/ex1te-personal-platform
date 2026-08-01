@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import StatusStrip from '../components/StatusStrip.astro';
 import SteppeSignal from '../components/SteppeSignal.astro';
 import TagList from '../components/TagList.astro';
@@ -20,15 +21,15 @@ const project = (await getCollection('projects', ({ data }) => !data.draft))[0];
           Здесь я собираю мысли, проекты и эксперименты о том, как инструменты меняют способ думать и работать. Сейчас я строю личную рабочую среду вокруг <strong>AI-агентов, терминала, заметок и автоматизации</strong> — и пишу о том, что действительно помогает, а что только создаёт шум.
         </p>
         <div class="hero-actions">
-          <a class="button primary" href="#published"><span>See published work</span><span>↓</span></a>
-          <a class="button" href="/about/"><span>About me</span><span>→</span></a>
+          <a class="button primary" href="#published"><span>See published work</span><Icon name="iconoir:arrow-down" aria-hidden="true" /></a>
+          <a class="button" href="/about/"><span>About me</span><Icon name="iconoir:arrow-right" aria-hidden="true" /></a>
         </div>
       </div>
 
       <div class="start-here" aria-label="Recommended pages">
-        <a class="start-item" href="/projects/memory-wiki/"><small>RU · Project</small><strong>Memory Wiki: карта истории Hermes</strong><em>Active</em></a>
-        <a class="start-item" href="/lab/unicode-spinner-playground/"><small>RU · Lab</small><strong>От Unicode spinner к Rose Curve</strong><em>Complete</em></a>
-        <a class="start-item" href="/writing/rn-tmuxp-workspaces/"><small>RU · Guide</small><strong>rn: проектные tmux-workspaces одной командой</strong><em>Published</em></a>
+        <a class="start-item" href="/projects/memory-wiki/"><small>Project</small><strong>Memory Wiki: карта истории Hermes</strong><em>Active</em></a>
+        <a class="start-item" href="/lab/unicode-spinner-playground/"><small>Lab</small><strong>От Unicode spinner к Rose Curve</strong><em>Complete</em></a>
+        <a class="start-item" href="/writing/rn-tmuxp-workspaces/"><small>Guide</small><strong>rn: проектные tmux-workspaces одной командой</strong><em>Published</em></a>
       </div>
     </div>
 
@@ -47,23 +48,23 @@ const project = (await getCollection('projects', ({ data }) => !data.draft))[0];
       <div class="published-list">
         {writing && (
           <a class="published-row" href={`/writing/${writing.id}/`}>
-            <small>Writing · {writing.data.kind}</small>
+            <small>{writing.data.kind}</small>
             <div><h3>{writing.data.title}</h3><p>{writing.data.description}</p><TagList tags={writing.data.tags} /></div>
-            <span>Read →</span>
+            <span class="icon-label">Read <Icon name="iconoir:arrow-right" aria-hidden="true" /></span>
           </a>
         )}
         {project && (
           <a class="published-row" href={`/projects/${project.id}/`}>
-            <small>Project · {project.data.status}</small>
+            <small>Project</small>
             <div><h3>{project.data.title}</h3><p>{project.data.description}</p><TagList tags={project.data.tags} /></div>
-            <span>Open →</span>
+            <span class="icon-label">Open <Icon name="iconoir:arrow-right" aria-hidden="true" /></span>
           </a>
         )}
         {lab && (
           <a class="published-row" href={`/lab/${lab.id}/`}>
-            <small>Lab · {lab.data.status}</small>
+            <small>Lab</small>
             <div><h3>{lab.data.title}</h3><p>{lab.data.description}</p><TagList tags={lab.data.tags} /></div>
-            <span>Explore →</span>
+            <span class="icon-label">Explore <Icon name="iconoir:arrow-right" aria-hidden="true" /></span>
           </a>
         )}
       </div>
@@ -82,19 +83,19 @@ const project = (await getCollection('projects', ({ data }) => !data.draft))[0];
           <span>01 / Human-readable memory</span>
           <h3>Agent memory that stays inspectable.</h3>
           <p>Локальные инструменты, которые помогают вернуться к прошлой работе без превращения истории в непрозрачную базу знаний.</p>
-          <strong>Memory Wiki →</strong>
+          <strong class="icon-label">Memory Wiki <Icon name="iconoir:arrow-right" aria-hidden="true" /></strong>
         </a>
         <a class="work-card" href="/writing/rn-tmuxp-workspaces/">
           <span>02 / Working environments</span>
           <h3>Small systems around real workflows.</h3>
           <p>Терминал, tmux, launchers и coding agents как одна практичная среда — без лишнего слоя управления.</p>
-          <strong>Read the rn guide →</strong>
+          <strong class="icon-label">Read the rn guide <Icon name="iconoir:arrow-right" aria-hidden="true" /></strong>
         </a>
         <a class="work-card" href="/lab/unicode-spinner-playground/">
           <span>03 / Interface experiments</span>
           <h3>Motion with a reason to exist.</h3>
           <p>Маленькие визуальные эксперименты, где математика, SVG и interaction detail проверяются в работающем интерфейсе.</p>
-          <strong>Open the experiment →</strong>
+          <strong class="icon-label">Open the experiment <Icon name="iconoir:arrow-right" aria-hidden="true" /></strong>
         </a>
       </div>
     </div>

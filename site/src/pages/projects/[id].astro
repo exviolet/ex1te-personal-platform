@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { getCollection, render } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import ReadingNavigation from '../../components/ReadingNavigation.astro';
 import TagList from '../../components/TagList.astro';
@@ -27,14 +28,14 @@ const visibilityLabel = {
   <article class="project-page" id="reading-top" data-reading-page>
     <header class="page-shell page-shell-wide project-hero">
       <div class="project-heading">
-        <div class="page-kicker">{entry.data.lang} · Project · {entry.data.status}</div>
+        <div class="page-kicker">Project</div>
         <h1 class="page-title">{entry.data.title}</h1>
         <p class="page-lead">{entry.data.description}</p>
         <TagList tags={entry.data.tags} />
         {(entry.data.repo || entry.data.demo) && (
           <div class="project-links">
-            {entry.data.repo && <a class="button primary" href={entry.data.repo}>Source ↗</a>}
-            {entry.data.demo && <a class="button" href={entry.data.demo}>Open demo ↗</a>}
+            {entry.data.repo && <a class="button primary" href={entry.data.repo}><span>Source</span><Icon name="iconoir:github" aria-hidden="true" /></a>}
+            {entry.data.demo && <a class="button" href={entry.data.demo}><span>Open demo</span><Icon name="iconoir:open-new-window" aria-hidden="true" /></a>}
           </div>
         )}
       </div>

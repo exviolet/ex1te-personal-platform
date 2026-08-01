@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TagList from '../../components/TagList.astro';
 
@@ -8,7 +9,7 @@ const entries = await getCollection('projects', ({ data }) => !data.draft);
 
 <BaseLayout title="Projects — ex1te" description="Долговечные проекты и инструменты Бакытжана.">
   <section class="page-shell">
-    <div class="page-kicker">Projects / Active · Maintenance · Archived</div>
+    <div class="page-kicker">Projects</div>
     <h1 class="page-title">Things that became durable.</h1>
     <p class="page-lead">Самостоятельные инструменты и интерфейсы, пережившие стадию одноразового эксперимента.</p>
     <hr class="page-rule" />
@@ -16,9 +17,9 @@ const entries = await getCollection('projects', ({ data }) => !data.draft);
       <div class="entry-list">
         {entries.map((entry) => (
           <a class="entry-card" href={`/projects/${entry.id}/`}>
-            <small>{entry.data.lang} · {entry.data.status}</small>
+            <small>{entry.data.status}</small>
             <div><h2>{entry.data.title}</h2><p>{entry.data.description}</p><TagList tags={entry.data.tags} /></div>
-            <span>Open →</span>
+            <span class="icon-label">Open <Icon name="iconoir:arrow-right" aria-hidden="true" /></span>
           </a>
         ))}
       </div>

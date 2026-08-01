@@ -21,7 +21,7 @@ metrics:
     label: "title-based map"
 flow:
   - label: "Export"
-    detail: "hermes sessions export → JSONL"
+    detail: "JSONL from hermes sessions export"
   - label: "Normalize"
     detail: "Python dataclasses and safe defaults"
   - label: "Index"
@@ -30,7 +30,7 @@ flow:
     detail: "Static local site on :8088"
 cover: "/projects/memory-wiki/sample-overview.webp"
 coverAlt: "Главная страница Memory Wiki, собранная из двух безопасных демонстрационных сессий"
-coverCaption: "Sample build · bundled demo data · no private sessions"
+coverCaption: "Sample build using bundled demo data; no private sessions."
 note: "Memory Wiki делает историю наблюдаемой для человека. Это не semantic retrieval, не долговременная память модели и не автоматическая база знаний."
 tags:
   - memory

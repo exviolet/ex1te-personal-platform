@@ -1,4 +1,6 @@
 ---
+import { Icon } from 'astro-icon/components';
+
 const year = new Date().getFullYear();
 ---
 
@@ -6,7 +8,7 @@ const year = new Date().getFullYear();
   <div class="shell footer-grid">
     <div class="footer-name">ex1te <em>/ Бақытжан</em></div>
     <div class="footer-links">
-      <a href="/rss.xml">RSS</a>
+      <a class="icon-label" href="/rss.xml"><Icon name="iconoir:rss-feed" aria-hidden="true" /> RSS</a>
       <span>GitHub</span>
       <span>Telegram</span>
       <span>Email</span>

@@ -1,5 +1,6 @@
 ---
 import type { MarkdownHeading } from 'astro';
+import { Icon } from 'astro-icon/components';
 
 interface Props {
   headings: MarkdownHeading[];
@@ -31,7 +32,7 @@ const items = headings.filter(({ depth }) => depth === 2 || depth === 3);
       </ol>
       <a class="reading-top" data-reading-top href="#reading-top">
         <span>Return</span>
-        <strong>↑ Top</strong>
+        <strong class="icon-label"><Icon name="iconoir:arrow-up" aria-hidden="true" /> Top</strong>
       </a>
     </aside>
 

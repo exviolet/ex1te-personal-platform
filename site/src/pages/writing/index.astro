@@ -9,7 +9,7 @@ const entries = (await getCollection('writing', ({ data }) => !data.draft))
 
 <BaseLayout title="Writing — ex1te" description="Эссе, заметки и практические руководства Бакытжана.">
   <section class="page-shell">
-    <div class="page-kicker">Writing / RU · EN · KK</div>
+    <div class="page-kicker">Writing</div>
     <h1 class="page-title">Ideas that survived contact with work.</h1>
     <p class="page-lead">Эссе, короткие заметки и руководства. Материал публикуется только тогда, когда в нём есть проверенная мысль, а не просто завершённый черновик.</p>
     <hr class="page-rule" />
@@ -17,7 +17,7 @@ const entries = (await getCollection('writing', ({ data }) => !data.draft))
       <div class="entry-list">
         {entries.map((entry) => (
           <a class="entry-card" href={`/writing/${entry.id}/`}>
-            <small>{entry.data.lang} · {entry.data.kind}</small>
+            <small>{entry.data.kind}</small>
             <div><h2>{entry.data.title}</h2><p>{entry.data.description}</p><TagList tags={entry.data.tags} /></div>
             <span>{entry.data.published?.toLocaleDateString('ru-RU')}</span>
           </a>

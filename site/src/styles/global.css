@@ -65,6 +65,8 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 a { color: inherit; }
+[data-icon] { width:1em; height:1em; flex:0 0 auto; stroke-width:1.55; }
+.icon-label { display:inline-flex; align-items:center; gap:.48em; }
 button { font: inherit; }
 :focus-visible { outline: 3px solid var(--signal); outline-offset: 3px; }
 .shell { width: min(1280px, calc(100% - 44px)); margin-inline: auto; }
@@ -264,7 +266,7 @@ html.theme-changing .lab-card { transition: color .3s ease, background-color .3s
   transition: padding-left .18s ease, color .18s ease;
 }
 .start-item:hover { padding-left: 10px; color: var(--signal); }
-.start-item small, .start-item em { color: var(--muted); font-family: var(--mono); font-size: 11px; font-style: normal; text-transform: uppercase; }
+.start-item small, .start-item em { color:var(--muted); font-family:var(--mono); font-size:11px; font-style:normal; text-transform:uppercase; }
 .start-item strong { font-size: 15px; letter-spacing: -.01em; }
 .tag-list { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0 0; padding:0; list-style:none; }
 .tag-list li { padding:6px 9px; border:1px solid var(--line); color:var(--muted); background:var(--surface-soft); font-family:var(--mono); font-size:11px; letter-spacing:.05em; line-height:1.1; text-transform:uppercase; }

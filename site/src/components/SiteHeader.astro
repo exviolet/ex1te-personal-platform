@@ -1,4 +1,5 @@
 ---
+import { Icon } from 'astro-icon/components';
 import ThemeSwitcher from './ThemeSwitcher.astro';
 
 const nav = [
@@ -57,7 +58,7 @@ const currentState = (href: string) => {
             <span class="site-nav-index">{String(index + 1).padStart(2, '0')}</span>
             <span class="site-nav-label">{label}</span>
             <span class="site-nav-status" aria-hidden="true">
-              {currentState(href) === 'location' ? 'SECTION' : currentState(href) === 'page' ? 'CURRENT' : '↗'}
+              {currentState(href) === 'location' ? 'SECTION' : currentState(href) === 'page' ? 'CURRENT' : <Icon name="iconoir:arrow-up-right" />}
             </span>
           </a>
         ))}

@@ -1,5 +1,6 @@
 ---
 import { getCollection } from 'astro:content';
+import { Icon } from 'astro-icon/components';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import TagList from '../../components/TagList.astro';
 
@@ -16,9 +17,9 @@ const entries = await getCollection('lab', ({ data }) => !data.draft);
       <div class="entry-list">
         {entries.map((entry) => (
           <a class="entry-card" href={`/lab/${entry.id}/`}>
-            <small>{entry.data.lang} · {entry.data.status}</small>
+            <small>{entry.data.status}</small>
             <div><h2>{entry.data.title}</h2><p>{entry.data.description}</p><TagList tags={entry.data.tags} /></div>
-            <span>Open →</span>
+            <span class="icon-label">Open <Icon name="iconoir:arrow-right" aria-hidden="true" /></span>
           </a>
         ))}
       </div>

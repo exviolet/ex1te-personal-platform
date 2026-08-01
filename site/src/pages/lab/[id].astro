@@ -18,7 +18,7 @@ const { Content, headings } = await render(entry);
 <BaseLayout title={`${entry.data.title} — ex1te`} description={entry.data.description} lang={entry.data.lang}>
   <article class="page-shell reading-page" id="reading-top" data-reading-page>
     <header class="reading-hero">
-      <div class="page-kicker">{entry.data.lang} · Lab · {entry.data.status}</div>
+      <div class="page-kicker">Lab</div>
       <h1 class="page-title">{entry.data.title}</h1>
       <p class="page-lead">{entry.data.description}</p>
       <TagList tags={entry.data.tags} />

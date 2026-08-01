@@ -3,6 +3,6 @@ import sitemap from '@astrojs/sitemap';
 import { defineConfig } from 'astro/config';
 
 export default defineConfig({
-  site: process.env.SITE_URL ?? 'https://ex1te.local',
+  site: process.env.SITE_URL ?? 'https://ex1te.pages.dev',
   integrations: [sitemap()],
 });

@@ -41,3 +41,15 @@ bun run verify
 ```
 
 `bun run verify` runs Astro type/schema checking, a static production build, and integration tests.
+
+## Deploy
+
+The static site is published to [ex1te.pages.dev](https://ex1te.pages.dev) with Cloudflare Pages.
+
+```bash
+cd site
+bun run build
+bunx wrangler pages deploy dist --project-name ex1te --branch main
+```
+
+`SITE_URL` can override the canonical base when a custom domain is connected later.
